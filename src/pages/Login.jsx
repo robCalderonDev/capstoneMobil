@@ -25,6 +25,8 @@ const Login = () => {
         setLoading(true);
         try {
             await signInWithEmailAndPassword(auth, email, password);
+
+
             ToastAndroid.show('Login Exitoso', ToastAndroid.SHORT);
 
         } catch (error) {
