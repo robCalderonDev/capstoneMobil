@@ -26,15 +26,12 @@ const Login = () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
 
-
-            ToastAndroid.show('Login Exitoso', ToastAndroid.SHORT);
-
         } catch (error) {
             if (error.code === 'auth/user-not-found') {
-                ToastAndroid.show('usuario no encontrado', ToastAndroid.SHORT);
+                ToastAndroid.show('usuario no encontrado', ToastAndroid.LONG);
             }
             if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-email') {
-                ToastAndroid.show('La cuenta o la contrasena es incorrecta', ToastAndroid.SHORT);
+                ToastAndroid.show('La cuenta o la contrasena es incorrecta', ToastAndroid.LONG);
             }
 
         } finally {

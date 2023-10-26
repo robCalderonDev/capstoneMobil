@@ -1,10 +1,9 @@
 import { Formik, useField } from 'formik'
 import React, { useContext, useEffect } from 'react'
-import { ActivityIndicator, Button, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, View } from 'react-native'
+import { ActivityIndicator, Button, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, View, } from 'react-native'
 import { loginValidationSchena } from '../validationSchemas/signUp'
 import StyledTextInput from '../components/styled/StyledTextInput'
-import DropdownComponent from '../components/DropDownButton'
-
+import Checkbox from 'expo-checkbox';
 import { RecordContext } from '../context/context'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useState } from 'react'
@@ -12,7 +11,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../FirebaseConfig'
 import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestore';
 
-
+import { Switch } from 'react-native-switch';
 
 const FormikInputValue = ({ name, ...props }) => {
     const [field, meta, helpers] = useField(name)
@@ -33,17 +32,16 @@ const FormikInputValue = ({ name, ...props }) => {
 const SignUp = () => {
     const { regiones, choosedItem, loanding, setLoading } = useContext(RecordContext);
     const [comunas, setComunas] = useState([]);
-
     const auth = FIREBASE_AUTH;//obtiene la autenticacion de firebase
     const initialValues = {//valores iniciales para el formulario 
         nombre: '',
+        apellido: '',
+        rut: '',
+        comuna: '',
+        isStudent: false,
+        calle: '',
         email: '',
         password: '',
-        rut: '',
-        region: '',
-        comuna: '',
-        calle: '',
-        rol: ''
     };
 
     const regionName = choosedItem || "patagonia";
@@ -63,21 +61,21 @@ const SignUp = () => {
         }
     };
 
-    const handleSubmitSignUp = async ({ nombre, email, password, rut, region, comuna, calle }) => {
+    const handleSubmitSignUp = async ({ nombre, email, password, rut, comuna, calle, isStudent, apellido }) => {
         try {
             const response = await createUserWithEmailAndPassword(auth, email, password);
             const userUid = response.user.uid;
 
             // Crea una referencia al documento del usuario utilizando su UID
-            const userDocRef = doc(FIRESTORE_DB, 'usuarios', userUid);
+            const nameCollection = isStudent ? 'estudiantes' : 'usuarios';
+            const userDocRef = doc(FIRESTORE_DB, nameCollection, userUid);
 
             const newUser = {
                 nombre: nombre,
-                email: email,
-                password: password,
+                apellido: apellido,
                 rut: rut,
-                region: region,
                 comuna: comuna,
+                email: email,
                 calle: calle
             };
 
@@ -85,19 +83,17 @@ const SignUp = () => {
             await setDoc(userDocRef, newUser);
 
             // Muestra un mensaje de éxito
-            alert('¡Tu usuario ha sido creado y se ha agregado a la colección de usuarios en Firestore!');
+            ToastAndroid.show('Cuenta Creada', ToastAndroid.LONG);
             console.log(response); // Puedes mostrar la respuesta de createUserWithEmailAndPassword si es necesario
         } catch (error) {
             // Maneja los errores, puedes mostrar mensajes de error o realizar otras acciones necesarias
-            console.error(error.message);
+
             ToastAndroid.show(error.message, ToastAndroid.LONG);
         } finally {
             // Realiza acciones finales si es necesario
             setLoading(false);
         }
     }
-    const [isFocus, setIsFocus] = useState(false);
-
 
     return (
         <Formik
@@ -113,30 +109,69 @@ const SignUp = () => {
                 return (
                     <ScrollView style={styles.form}>
                         <FormikInputValue name='nombre' placeholder='Nombre' onChangeText={props.handleChange('nombre')} value={props.values.nombre} />
+                        <FormikInputValue name='nombre' placeholder='Apellido' onChangeText={props.handleChange('apellido')} value={props.values.apellido} />
+
                         <FormikInputValue name='rut' placeholder='Rut' onChangeText={props.handleChange('rut')} value={props.values.rut} />
+                        {/* <View style={styles.container}>
 
+                            <View style={styles.section}>
+                                <Checkbox
+                                    style={styles.checkbox}
+                                    value={isChecked}
+                                    onValueChange={setChecked}
+                                    color={isChecked ? '#39676E' : undefined}
+                                />
+                                <Text style={styles.paragraph}>Eres estudiante?</Text>
+                            </View>
 
-                        <DropdownComponent data={regiones.regiones} labelField={'region'} valueField={'_index'} setFieldValue={props.setFieldValue} />
+                        </View> */}
+                        {/* <DropdownComponent data={regiones.regiones} labelField={'region'} valueField={'_index'} setFieldValue={props.setFieldValue} /> */}
                         <Dropdown
 
                             style={styles.dropdown}
                             placeholderStyle={styles.placeholderStyle}
                             selectedTextStyle={styles.selectedTextStyle}
                             inputSearchStyle={styles.inputSearchStyle}
-                            iconStyle={styles.iconStyle}
+
                             data={comunas}
                             maxHeight={300}
                             search
-                            placeholder={!isFocus ? 'Select item' : '...'}
-                            searchPlaceholder="Search..."
-
+                            placeholder="Selecciona Comuna"
+                            searchPlaceholder="Buscar..."
+                            valueField="value"
                             labelField="label"
                             onChange={(item) => {
                                 props.setFieldValue('comuna', item.label);
-
+                                console.log(item.label, 'item')
                             }}
 
                         />
+                        <View style={styles.container}>
+                            <Text>Eres estudiante?</Text>
+                            <Switch
+                                name='isStudent'
+                                backgroundActive={'#2b6e97'}
+                                backgroundInactive={'#dedede'}
+                                circleActiveColor={'#fff'}
+                                circleInActiveColor={'#fff'}
+                                onValueChange={(value) => {
+                                    props.setFieldValue("isStudent", value); // Actualiza el campo en Formik
+                                    // Puedes omitir setChecked si no se necesita para otros fines
+
+                                }}
+                                value={props.values.isStudent} // Debería coincidir con el campo en Formik
+                                onChange={() => props.setFieldValue("isStudent", !props.values.isStudent)}
+                                activeText={'Si'}
+                                inActiveText={'No'}
+                                switchLeftPx={5}
+                                switchRightPx={5}
+                                switchWidthMultiplier={1.8}
+                                switchBorderRadius={30}
+                            />
+
+
+                        </View>
+
 
                         <FormikInputValue name='calle' placeholder='Calle' onChangeText={props.handleChange('calle')} value={props.values.calle} />
                         <FormikInputValue name='email' placeholder='E-mail' onChangeText={props.handleChange('email')} value={props.values.email} />
@@ -169,6 +204,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 10,
         marginBottom: 10,
+        placeholderColor: 'red',
     },
     selectedTextStyle: {
         color: 'gray', // Cambia el color de texto seleccionado en el Dropdown
@@ -180,6 +216,17 @@ const styles = StyleSheet.create({
         marginTop: -5,
         marginBottom: 12 // Cambia el color de texto en el campo de búsqueda
     },
+    placeholderStyle: {
+        color: 'gray',
+    },
+    container: {
+
+        flexDirection: 'row',
+    },
+    switch: {
+
+
+    }
 
 
 

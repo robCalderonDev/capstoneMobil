@@ -6,7 +6,7 @@ export const RecordContext = createContext(null);
 
 const RecordProvider = ({ children }) => {
 
-    const [choosedItem, setChoosedItem] = useState('');
+    const [choosedItem, setChoosedItem] = useState('Región Metropolitana de Santiago');
     const [loanding, setLoading] = useState('');
 
 
