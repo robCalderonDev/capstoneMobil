@@ -30,7 +30,7 @@ const DropdownComponent = ({ data, labelField, valueField, setFieldValue }) => {
             onChange={(item) => {
 
                 const selectedIndex = data.findIndex((element) => element === item);
-                console.log(item.region, 'item')
+
                 setFieldValue('region', item.region);
                 setValue(item[valueField]);
                 setChoosedItem(item[labelField])

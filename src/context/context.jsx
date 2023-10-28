@@ -8,8 +8,8 @@ const RecordProvider = ({ children }) => {
 
     const [choosedItem, setChoosedItem] = useState('Región Metropolitana de Santiago');
     const [loanding, setLoading] = useState('');
-
-
+    const [dataUserDb, setDataUserDb] = useState({})
+    const [user, setUser] = useState(null)
     return (
         <RecordContext.Provider
             value={{
@@ -17,7 +17,11 @@ const RecordProvider = ({ children }) => {
                 choosedItem,
                 setChoosedItem,
                 loanding,
-                setLoading
+                setLoading,
+                dataUserDb,
+                setDataUserDb,
+                user,
+                setUser
 
 
             }}

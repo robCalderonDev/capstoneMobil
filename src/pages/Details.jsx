@@ -1,12 +1,15 @@
 import { Text, View } from 'react-native'
 import React, { Component } from 'react'
+import FormIncidence from '../components/FormIncidence'
 
-export default class Details extends Component {
-    render() {
-        return (
-            <View>
-                <Text>Details</Text>
-            </View>
-        )
-    }
+const Details = () => {
+    return (
+        <View>
+            <Text>Details</Text>
+            <FormIncidence />
+        </View>
+
+    )
 }
+
+export default Details

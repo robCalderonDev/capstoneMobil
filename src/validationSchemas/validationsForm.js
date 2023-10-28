@@ -27,3 +27,4 @@ export const loginValidationSchena = yup.object().shape({
 
 
 })
+export const formValidationSchema = yup.object().shape({})

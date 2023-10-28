@@ -1,7 +1,7 @@
 import { Formik, useField } from 'formik'
 import React, { useContext, useEffect } from 'react'
 import { ActivityIndicator, Button, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, View, } from 'react-native'
-import { loginValidationSchena } from '../validationSchemas/signUp'
+import { loginValidationSchena } from '../validationSchemas/validationsForm'
 import StyledTextInput from '../components/styled/StyledTextInput'
 import Checkbox from 'expo-checkbox';
 import { RecordContext } from '../context/context'
@@ -76,7 +76,8 @@ const SignUp = () => {
                 rut: rut,
                 comuna: comuna,
                 email: email,
-                calle: calle
+                calle: calle,
+                isStudent: isStudent,
             };
 
             // Establece los datos en el documento en Firestore
@@ -84,7 +85,7 @@ const SignUp = () => {
 
             // Muestra un mensaje de éxito
             ToastAndroid.show('Cuenta Creada', ToastAndroid.LONG);
-            console.log(response); // Puedes mostrar la respuesta de createUserWithEmailAndPassword si es necesario
+            // Puedes mostrar la respuesta de createUserWithEmailAndPassword si es necesario
         } catch (error) {
             // Maneja los errores, puedes mostrar mensajes de error o realizar otras acciones necesarias
 
@@ -103,7 +104,7 @@ const SignUp = () => {
             initialValues={initialValues}
             onSubmit={(values) => {
                 handleSubmitSignUp(values)
-                console.log(values, 'data')
+
             }}>
             {(props) => {
                 return (
@@ -142,12 +143,12 @@ const SignUp = () => {
                             labelField="label"
                             onChange={(item) => {
                                 props.setFieldValue('comuna', item.label);
-                                console.log(item.label, 'item')
+
                             }}
 
                         />
                         <View style={styles.container}>
-                            <Text>Eres estudiante?</Text>
+                            <Text>Eres estudiante de educacion media?</Text>
                             <Switch
                                 name='isStudent'
                                 backgroundActive={'#2b6e97'}
@@ -156,7 +157,7 @@ const SignUp = () => {
                                 circleInActiveColor={'#fff'}
                                 onValueChange={(value) => {
                                     props.setFieldValue("isStudent", value); // Actualiza el campo en Formik
-                                    // Puedes omitir setChecked si no se necesita para otros fines
+
 
                                 }}
                                 value={props.values.isStudent} // Debería coincidir con el campo en Formik

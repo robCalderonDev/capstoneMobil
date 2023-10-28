@@ -1,36 +1,43 @@
 // In App.js in a new project
 
-import { react, useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import 'react-native-gesture-handler';
+import { useEffect, useState } from 'react';
+import React from 'react';
+import { View, Text, Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { User, onAuthStateChanged } from 'firebase/auth';
+import { FIREBASE_AUTH } from './src/FirebaseConfig';
+
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import Login from './src/pages/Login';
 import List from './src/pages/List';
-import { User, onAuthStateChanged } from 'firebase/auth'
-import { FIREBASE_AUTH } from './src/FirebaseConfig';
 import Details from './src/pages/Details';
-import Main from './src/components/Main';
+import Home from './src/pages/Home';
 import SignUp from './src/pages/SignUp';
 import RecordProvider from './src/context/context';
+import { DrawerToggleButton } from '@react-navigation/drawer';
+import { StatusBar } from 'expo-status-bar';
 
 
-
+const Drawer = createDrawerNavigator();
 
 const Stack = createNativeStackNavigator();
-const InsideStack = createNativeStackNavigator();
 
 
-const InsideMain = () => {
+
+const StackMain = () => {
   //Esto es lo que va a ir dentro del main
   return (
-    <InsideStack.Navigator>
-      <InsideStack.Screen name='Main' component={Main} />
-      <InsideStack.Screen name='details' component={Details} />
-    </InsideStack.Navigator>
+    <NavigationContainer independent={true}>
+      <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerPosition: "right", headerLeft: false, headerRight: () => <DrawerToggleButton /> }} >
+        <Drawer.Screen name="Home" component={Home} />
+
+        <Drawer.Screen name="Details" component={Details} />
+      </Drawer.Navigator>
+    </NavigationContainer >
   )
 }
-
-<Stack.Screen name="SignUp" component={SignUp} />
 
 
 function App() {
@@ -39,26 +46,30 @@ function App() {
 
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
-      console.group('user', user)
+
       setUser(user);
     })
   }, [])
   return (
-    <RecordProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName='Login'>
-          {user ? (
-            <Stack.Screen name='Main' component={InsideMain} options={{ headerShown: false }} />
+    <>
+      <StatusBar style="light" />
+      <RecordProvider>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName='Login'>
+            {user ? (
+              <Stack.Screen name='Main' component={StackMain} options={{ headerShown: false }} />
 
-          ) : (<>
-            <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
-            <Stack.Screen name='SignUp' component={SignUp} />
+            ) : (<>
+              <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
+              <Stack.Screen name='SignUp' component={SignUp} />
 
-          </>)}
+            </>)}
 
-        </Stack.Navigator>
-      </NavigationContainer>
-    </RecordProvider>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </RecordProvider>
+    </>
+
   );
 }
 
