@@ -1,15 +1,18 @@
 
 import { useNavigation } from '@react-navigation/native';
-import { Formik } from 'formik';
-import React from 'react';
-import { Text, View, Button, StyleSheet, TextInput } from 'react-native';
+import { Formik, useField } from 'formik';
+import React, { useEffect } from 'react';
+import { Text, View, Button, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { formValidationSchema, } from '../validationSchemas/validationsForm';
-import { ScrollView } from 'react-native-gesture-handler';
+
 import { Dropdown } from 'react-native-element-dropdown';
 import StyledTextInput from './styled/StyledTextInput';
+import { useState } from 'react';
+import * as Location from 'expo-location';
 
 const FormikInputValueIncidence = ({ name, ...props }) => {
     const [field, meta, helpers] = useField(name)
+
 
     return (
         <>
@@ -24,6 +27,22 @@ const FormikInputValueIncidence = ({ name, ...props }) => {
     )
 }
 const FormIncidence = () => {
+    const [location, setLocation] = useState('')
+
+    useEffect(() => {
+        const getPermission = async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Please dar permisos para acceder a la ubicacion');
+                return;
+            }
+            let currentLocation = await Location.getCurrentPositionAsync({});
+            setLocation(currentLocation);
+            console.log('Location: ', currentLocation)
+        }
+        getPermission()
+    }, [])
+
     const navigation = useNavigation();
     const incidenceType = [{ label: 'Academica', value: 'Academica' }, { label: 'comunitaria', value: 'comuntaria' },]
     initialValues = {
@@ -69,17 +88,18 @@ const FormIncidence = () => {
                             }}
 
                         />
-                        <StyledTextInput name='asunto' placeholder='Asunto' />
+                        <FormikInputValueIncidence name='asunto' placeholder='Asunto' />
                         <TextInput style={styles.TextInput}
                             multiline={true}
                             numberOfLines={4}
                             placeholder='Descripcions'
                         />
+
+                        <FormikInputValueIncidence name='calle' placeholder='Calle' />
                     </ScrollView>
                 )
 
-            }
-            }
+            }}
 
         </Formik>
     );

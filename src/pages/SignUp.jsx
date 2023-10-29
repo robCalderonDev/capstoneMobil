@@ -1,7 +1,7 @@
-import { Formik, useField } from 'formik'
+import { ErrorMessage, Formik, useField } from 'formik'
 import React, { useContext, useEffect } from 'react'
-import { ActivityIndicator, Button, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, View, } from 'react-native'
-import { loginValidationSchena } from '../validationSchemas/validationsForm'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View, } from 'react-native'
+import { loginValidationSchena, loginValidationSchenaStudent, loginValidationSchenaUser } from '../validationSchemas/validationsForm'
 import StyledTextInput from '../components/styled/StyledTextInput'
 import Checkbox from 'expo-checkbox';
 import { RecordContext } from '../context/context'
@@ -10,8 +10,12 @@ import { useState } from 'react'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../FirebaseConfig'
 import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestore';
-
 import { Switch } from 'react-native-switch';
+import colegios from '../data/colegios.json';
+import { obtenerDataColegios } from '../helpers/parsinData'
+
+import ModalForm from '../components/ModalForm'
+
 
 const FormikInputValue = ({ name, ...props }) => {
     const [field, meta, helpers] = useField(name)
@@ -30,18 +34,24 @@ const FormikInputValue = ({ name, ...props }) => {
 }
 
 const SignUp = () => {
-    const { regiones, choosedItem, loanding, setLoading } = useContext(RecordContext);
+    const { regiones, choosedItem, loanding, setLoading, dataUserDb, setDataUserDb } = useContext(RecordContext);
     const [comunas, setComunas] = useState([]);
+    const [cursosParse, setCursosParse] = useState([{}])
+    const [colegiosParseado, setColegiosParseado] = useState({})
+    const [isNormalUser, setIsNormalUser] = useState(false)
+    const [modalVisible, setModalVisible] = useState(true);
     const auth = FIREBASE_AUTH;//obtiene la autenticacion de firebase
     const initialValues = {//valores iniciales para el formulario 
         nombre: '',
         apellido: '',
         rut: '',
         comuna: '',
-        isStudent: false,
         calle: '',
         email: '',
         password: '',
+        colegio: '',
+        curso: '',
+
     };
 
     const regionName = choosedItem || "patagonia";
@@ -49,6 +59,9 @@ const SignUp = () => {
     useEffect(() => {
         const comunasData = getComunasByRegion(regionName);
         setComunas(comunasData);
+        const colegioParseado = obtenerDataColegios(colegios)
+        setColegiosParseado(colegioParseado)
+        CursoDropdown()
     }, [regionName]);
 
     const getComunasByRegion = (regionName) => {
@@ -61,35 +74,65 @@ const SignUp = () => {
         }
     };
 
-    const handleSubmitSignUp = async ({ nombre, email, password, rut, comuna, calle, isStudent, apellido }) => {
+    const CursoDropdown = () => {
+        const dropdownData = cursos.cursos.map((curso, index) => ({
+            value: curso,
+            label: curso,
+        }));
+        setCursosParse(dropdownData)
+    }
+
+    const handleSubmitSignUp = async ({ nombre, email, password, rut, comuna, calle, apellido, colegio, curso }, setIsNormalUser) => {
         try {
             const response = await createUserWithEmailAndPassword(auth, email, password);
             const userUid = response.user.uid;
 
             // Crea una referencia al documento del usuario utilizando su UID
-            const nameCollection = isStudent ? 'estudiantes' : 'usuarios';
-            const userDocRef = doc(FIRESTORE_DB, nameCollection, userUid);
+            const nameCollection = setIsNormalUser ? 'usuarios' : 'estudiantes';
+            const collectionRef = collection(FIRESTORE_DB, nameCollection);
 
-            const newUser = {
-                nombre: nombre,
-                apellido: apellido,
-                rut: rut,
-                comuna: comuna,
-                email: email,
-                calle: calle,
-                isStudent: isStudent,
-            };
+            if (nameCollection === 'estudiantes') {
+                const newUser = {
+                    nombre: nombre,
+                    apellido: apellido,
+                    colegio: colegio,
+                    curso: curso,
+                    email: email,
 
-            // Establece los datos en el documento en Firestore
-            await setDoc(userDocRef, newUser);
+                };
+                // Establece los datos en el documento en Firestore
+                await addDoc(collectionRef, newUser);
 
-            // Muestra un mensaje de éxito
-            ToastAndroid.show('Cuenta Creada', ToastAndroid.LONG);
-            // Puedes mostrar la respuesta de createUserWithEmailAndPassword si es necesario
+                // Muestra un mensaje de éxito
+                ToastAndroid.show('Cuenta Creada', ToastAndroid.LONG);
+                // Puedes mostrar la respuesta de createUserWithEmailAndPassword si es necesario
+                setDataUserDb(newUser)
+            }
+            else {
+                const newUser = {
+                    nombre: nombre,
+                    apellido: apellido,
+                    rut: rut,
+                    comuna: comuna,
+                    calle: calle,
+                    email: email,
+
+                };
+                // Establece los datos en el documento en Firestore
+                await addDoc(collectionRef, newUser);
+
+                // Muestra un mensaje de éxito
+                ToastAndroid.show('Cuenta Creada', ToastAndroid.LONG);
+                setDataUserDb(newUser)
+                // Puedes mostrar la respuesta de createUserWithEmailAndPassword si es necesario
+            }
+
+
+
         } catch (error) {
             // Maneja los errores, puedes mostrar mensajes de error o realizar otras acciones necesarias
-
-            ToastAndroid.show(error.message, ToastAndroid.LONG);
+            console.log(error.message)
+            // ToastAndroid.show(error.message, ToastAndroid.LONG);
         } finally {
             // Realiza acciones finales si es necesario
             setLoading(false);
@@ -98,21 +141,130 @@ const SignUp = () => {
 
     return (
         <Formik
-            validationSchema={loginValidationSchena}
+            validationSchema={isNormalUser ? loginValidationSchenaUser : loginValidationSchenaStudent}
             validateOnChange={false} // Disable validation every field change
             validateOnBlur={false} // Disable validation every field blur
             initialValues={initialValues}
             onSubmit={(values) => {
                 handleSubmitSignUp(values)
 
+                alert('paso')
+
             }}>
             {(props) => {
                 return (
                     <ScrollView style={styles.form}>
-                        <FormikInputValue name='nombre' placeholder='Nombre' onChangeText={props.handleChange('nombre')} value={props.values.nombre} />
-                        <FormikInputValue name='nombre' placeholder='Apellido' onChangeText={props.handleChange('apellido')} value={props.values.apellido} />
+                        {modalVisible ? (
+                            <ModalForm setIsNormalUser={setIsNormalUser} setModalVisible={setModalVisible} modalVisible={modalVisible} />
+                        ) : (isNormalUser ? (
+                            <>
+                                <FormikInputValue name='nombre' placeholder='Nombre' onChangeText={props.handleChange('nombre')} value={props.values.nombre} />
+                                <FormikInputValue name='apellido' placeholder='Apellido' onChangeText={props.handleChange('apellido')} value={props.values.apellido} />
+                                <FormikInputValue name='rut' placeholder='Rut' onChangeText={props.handleChange('rut')} value={props.values.rut} />
+                                <Dropdown
+                                    style={styles.dropdown}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    name='comuna'
+                                    data={comunas}
+                                    maxHeight={300}
+                                    search
+                                    placeholder="Selecciona Comuna"
+                                    searchPlaceholder="Buscar..."
+                                    valueField="value"
+                                    labelField="label"
+                                    onChange={(item) => {
+                                        props.setFieldValue('comuna', item.label);
+                                    }}
+                                />
 
-                        <FormikInputValue name='rut' placeholder='Rut' onChangeText={props.handleChange('rut')} value={props.values.rut} />
+                                {props.errors.comuna && props.touched.comuna && (
+                                    <Text style={styles.error}>{props.errors.comuna}</Text>
+                                )}
+                                <FormikInputValue name='calle' placeholder='Calle' onChangeText={props.handleChange('calle')} value={props.values.calle} />
+                                <FormikInputValue name='email' placeholder='E-mail' onChangeText={props.handleChange('email')} value={props.values.email} />
+                                <FormikInputValue name='password' placeholder='Password' secureTextEntry onChangeText={props.handleChange('password')} value={props.values.password} />
+                                <FormikInputValue name='passwordConfirmation' placeholder='Confirm password' secureTextEntry />
+                                {loanding ? <ActivityIndicator size='large' color='#0000dff' />
+                                    :
+
+                                    <TouchableOpacity onPress={() => props.handleSubmit()} style={styles.touchableSignUp}>
+                                        <Text style={styles.touchabletext}>Registrarse</Text>
+                                    </TouchableOpacity>}
+                            </>
+
+                        ) : (
+                            <>
+
+                                <FormikInputValue name='nombre' placeholder='Nombre' onChangeText={props.handleChange('nombre')} value={props.values.nombre} />
+                                <FormikInputValue name='nombre' placeholder='Apellido' onChangeText={props.handleChange('apellido')} value={props.values.apellido} />
+                                <Dropdown
+
+                                    style={styles.dropdown}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    name='colegio'
+                                    data={colegiosParseado}
+                                    maxHeight={300}
+                                    search
+                                    placeholder="Selecciona Colegio"
+                                    searchPlaceholder="Buscar..."
+                                    valueField="NOMBRE ESTABLECIMIENTO"
+                                    labelField="NOMBRE ESTABLECIMIENTO"
+                                    onChange={(item) => {
+                                        props.setFieldValue('colegio', item['NOMBRE ESTABLECIMIENTO'])
+                                    }}
+
+                                />
+                                {props.errors.colegio && props.touched.colegio && (
+                                    <Text style={styles.error}>{props.errors.colegio}</Text>
+                                )}
+
+
+                                <Dropdown
+
+                                    style={styles.dropdown}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    name='curso'
+                                    data={cursosParse}
+                                    maxHeight={300}
+                                    search
+                                    placeholder="Selecciona Curso"
+                                    searchPlaceholder="Buscar..."
+                                    valueField="value"
+                                    labelField="label"
+                                    onChange={(item) => {
+                                        props.setFieldValue('curso', item['label'])
+
+
+
+
+                                    }}
+
+                                />
+                                {props.errors.curso && props.touched.curso && (
+                                    <Text style={styles.error}>{props.errors.curso}</Text>
+                                )}
+                                <FormikInputValue name='email' placeholder='E-mail' onChangeText={props.handleChange('email')} value={props.values.email} />
+                                <FormikInputValue name='password' placeholder='Password' secureTextEntry onChangeText={props.handleChange('password')} value={props.values.password} />
+                                <FormikInputValue name='passwordConfirmation' placeholder='Confirm password' secureTextEntry />
+                                {loanding ? <ActivityIndicator size='large' color='#0000dff' />
+                                    :
+                                    <TouchableOpacity onPress={() => props.handleSubmit()} style={styles.touchableSignUp}>
+                                        <Text style={styles.touchabletext}>Registrarse</Text>
+                                    </TouchableOpacity>
+                                }
+                            </>
+                        ))
+                        }
+
+
+
+
                         {/* <View style={styles.container}>
 
                             <View style={styles.section}>
@@ -126,27 +278,8 @@ const SignUp = () => {
                             </View>
 
                         </View> */}
-                        {/* <DropdownComponent data={regiones.regiones} labelField={'region'} valueField={'_index'} setFieldValue={props.setFieldValue} /> */}
-                        <Dropdown
 
-                            style={styles.dropdown}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-
-                            data={comunas}
-                            maxHeight={300}
-                            search
-                            placeholder="Selecciona Comuna"
-                            searchPlaceholder="Buscar..."
-                            valueField="value"
-                            labelField="label"
-                            onChange={(item) => {
-                                props.setFieldValue('comuna', item.label);
-
-                            }}
-
-                        />
+                        {/* 
                         <View style={styles.container}>
                             <Text>Eres estudiante de educacion media?</Text>
                             <Switch
@@ -157,7 +290,7 @@ const SignUp = () => {
                                 circleInActiveColor={'#fff'}
                                 onValueChange={(value) => {
                                     props.setFieldValue("isStudent", value); // Actualiza el campo en Formik
-
+                                    setChecked(value);
 
                                 }}
                                 value={props.values.isStudent} // Debería coincidir con el campo en Formik
@@ -172,21 +305,16 @@ const SignUp = () => {
 
 
                         </View>
+                     */}
 
 
-                        <FormikInputValue name='calle' placeholder='Calle' onChangeText={props.handleChange('calle')} value={props.values.calle} />
-                        <FormikInputValue name='email' placeholder='E-mail' onChangeText={props.handleChange('email')} value={props.values.email} />
-                        <FormikInputValue name='password' placeholder='Password' secureTextEntry onChangeText={props.handleChange('password')} value={props.values.password} />
-                        <FormikInputValue name='passwordConfirmation' placeholder='Confirm password' secureTextEntry />
 
-                        {loanding ? <ActivityIndicator size='large' color='#0000dff' />
-                            :
-                            <Button onPress={props.handleSubmit} title='Sign Up' />}
+
 
                     </ScrollView>
                 )
             }}
-        </Formik>
+        </Formik >
     )
 }
 
@@ -195,6 +323,24 @@ const SignUp = () => {
 
 
 const styles = StyleSheet.create({
+    form: {
+        flex: 1,
+        paddingHorizontal: 50,
+        backgroundColor: '#1E1F22',
+
+    },
+    touchableSignUp: {
+        width: '80%',
+        height: 50,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: '#2F5A73',
+    },
+    touchabletext: {
+        fontWeight: 'bold',
+        fontSize: 15,
+        color: '#fff',
+    },
     dropdown: {
         height: 50,
         borderColor: 'gray',
@@ -202,6 +348,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         backgroundColor: 'white',
         width: '80%',
+        height: 50,
         paddingHorizontal: 20,
         paddingVertical: 10,
         marginBottom: 10,
@@ -209,11 +356,13 @@ const styles = StyleSheet.create({
     },
     selectedTextStyle: {
         color: 'gray', // Cambia el color de texto seleccionado en el Dropdown
+        fontSize: 15,
     },
     inputSearchStyle: {
         color: 'black', // Cambia el color de texto en el campo de búsqueda
+        fontSize: 15,
     }, error: {
-        color: 'red',
+        color: '#ef9a9a',
         marginTop: -5,
         marginBottom: 12 // Cambia el color de texto en el campo de búsqueda
     },

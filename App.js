@@ -18,6 +18,7 @@ import SignUp from './src/pages/SignUp';
 import RecordProvider from './src/context/context';
 import { DrawerToggleButton } from '@react-navigation/drawer';
 import { StatusBar } from 'expo-status-bar';
+import Sign from './src/pages/Sign';
 
 
 const Drawer = createDrawerNavigator();
@@ -61,7 +62,13 @@ function App() {
 
             ) : (<>
               <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
-              <Stack.Screen name='SignUp' component={SignUp} />
+              <Stack.Screen name='SignUp' component={SignUp} options={{
+                // Oculta el encabezado
+                headerStyle: {
+                  backgroundColor: '#1E1F22',
+                  // Cambia el color de fondo de la pantalla
+                }, headerTintColor: 'white'
+              }} />
 
             </>)}
 

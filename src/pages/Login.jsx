@@ -1,4 +1,4 @@
-import { View, StyleSheet, ActivityIndicator, Button, ToastAndroid, KeyboardAvoidingView, TouchableOpacity, Text, TextInput } from 'react-native'
+import { View, StyleSheet, ActivityIndicator, Button, ToastAndroid, KeyboardAvoidingView, TouchableOpacity, Text, TextInput, Image } from 'react-native'
 import React, { useState } from 'react'
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../FirebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -65,7 +65,21 @@ const Login = () => {
 
     return (
         <KeyboardAvoidingView behavior='height' style={styles.container}>
-            <Text style={styles.logo}>Logo</Text>
+            <Image
+                source={require('./../img/logo.png')}
+                style={{
+                    width: 200, height: 200, marginTop: 50, tintColor: '#fff', marginBottom: -20
+                }}
+            />
+            <Image
+                source={require('./../img/logoName.png')}
+                style={{
+                    marginTop: 50, tintColor: '#fff',
+                    width: 200, height: 30
+                }}
+            />
+
+
             <Text style={styles.subtitle}>Ingresa a tu cuenta </Text>
 
             <TextInput
@@ -73,14 +87,19 @@ const Login = () => {
                 onChangeText={(text) => setEmail(text)}
                 style={styles.input}
                 placeholder='Email'
-                autoCapitalize='none' />
+                autoCapitalize='none'
+                placeholderTextColor={'#fff'}
+            />
+
             <TextInput
                 value={password}
                 onChangeText={(text) => setPassword(text)}
                 style={styles.input}
                 placeholder='Password'
                 autoCapitalize='none'
-                secureTextEntry={true} />
+                secureTextEntry={true}
+                placeholderTextColor={'#fff'}
+            />
 
             <View style={styles.reset}>
                 <Text style={styles.textStyle}>Olvidaste tu contrasena?</Text>
@@ -128,7 +147,7 @@ const styles = StyleSheet.create({
 
     },
     input: {
-        backgroundColor: '#fff',
+        backgroundColor: '#777777',
         padding: 10,
         paddingStart: 30,
         width: '80%',
@@ -136,6 +155,8 @@ const styles = StyleSheet.create({
         marginTop: 20,
         borderRadius: 30,
         marginVertical: 5,
+        color: '#fff',
+
 
     },
 
