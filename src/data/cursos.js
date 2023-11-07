@@ -1,3 +1,14 @@
 export default cursos = {
-    'cursos': ['1°A', '1°B', '2°A', '2°B', '3°A', '3°B', '4°A', '4°B', '5°A', '5°B', '6°A', '6°B', '7°A', '7°B', '8°A', '1°B', '1°A', '1°B', '2°A', '2°B', '4°A', '4°B',]
+    'cursos': ['1° Básico',
+        '2° Básico',
+        '3° Básico',
+        '4° Básico',
+        '5° Básico',
+        '6° Básico',
+        '7° Básico',
+        '8° Básico',
+        '1° Medio',
+        '2° Medio',
+        '3° Medio',
+        '4° Medio']
 }

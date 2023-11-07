@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Modal, StyleSheet, Text, Pressable, View } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 
-const ModalForm = ({ setIsNormalUser, modalVisible, setModalVisible }) => {
+const ModalForm = ({ setIsStudent, modalVisible, setModalVisible }) => {
 
     return (
         <View style={styles.centeredView}>
@@ -19,13 +19,13 @@ const ModalForm = ({ setIsNormalUser, modalVisible, setModalVisible }) => {
                         <Text style={styles.modalText}>Eres estudiante?</Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity style={styles.touchableOpacity1} onPress={() => {
-                                setIsNormalUser(false);
+                                setIsStudent(false);
                                 setModalVisible(!modalVisible);
                             }}>
                                 <Text style={styles.text}>Si</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.touchableOpacity} onPress={() => {
-                                setIsNormalUser(true);
+                                setIsStudent(true);
                                 setModalVisible(!modalVisible);
                             }}>
                                 <Text style={styles.text}>No</Text>

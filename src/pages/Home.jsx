@@ -12,17 +12,39 @@ import { RecordContext } from '../context/context';
 
 
 const Home = () => {
+
+
     const navigation = useNavigation(); // Obtiene el objeto navigation
-    const { regiones, choosedItem, loanding, setLoading, setDataUserDb, dataUserDb } = useContext(RecordContext);
+    const { regiones, choosedItem, loanding, setLoading, dataUserDb, setDataUserDb, getDataUser } = useContext(RecordContext);
+    const signOut = () => {
+
+
+        FIREBASE_AUTH.signOut()
+        setDataUserDb({})
+
+    }
+
+
     useEffect(() => {
-        console.log(dataUserDb)
+        const fetchData = async () => {
+            try {
+                console.log(dataUserDb, 'colegio');
+                await getDataUser();
+                console.log(dataUserDb, 'este es home');
+            } catch (error) {
+                console.error('Error al obtener los datos del usuario:', error);
+            }
+        };
+
+        fetchData();
 
     }, [])
     return (
         <View style={styles.container}>
-            <Text>Hola este es el main</Text>
-            <Button title="Boton main Details" onPress={() => navigation.navigate('details')} />
-            <Button title="BOTON MAIN LOGOUT" onPress={() => FIREBASE_AUTH.signOut()} />
+            {dataUserDb.rol === 'admin' ? <Text>Hola eres admin</Text> : <Text>Hola eres estudiante</Text>}
+            <Text>Hola este tu correo {dataUserDb.email} </Text>
+
+
         </View>
 
 

@@ -3,7 +3,7 @@
 import 'react-native-gesture-handler';
 import { useEffect, useState } from 'react';
 import React from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { User, onAuthStateChanged } from 'firebase/auth';
@@ -18,27 +18,17 @@ import SignUp from './src/pages/SignUp';
 import RecordProvider from './src/context/context';
 import { DrawerToggleButton } from '@react-navigation/drawer';
 import { StatusBar } from 'expo-status-bar';
-import Sign from './src/pages/Sign';
+import StackMain from './src/components/StackMain';
 
 
-const Drawer = createDrawerNavigator();
+
+
 
 const Stack = createNativeStackNavigator();
 
 
 
-const StackMain = () => {
-  //Esto es lo que va a ir dentro del main
-  return (
-    <NavigationContainer independent={true}>
-      <Drawer.Navigator initialRouteName="Home" screenOptions={{ drawerPosition: "right", headerLeft: false, headerRight: () => <DrawerToggleButton /> }} >
-        <Drawer.Screen name="Home" component={Home} />
 
-        <Drawer.Screen name="Details" component={Details} />
-      </Drawer.Navigator>
-    </NavigationContainer >
-  )
-}
 
 
 function App() {
@@ -79,5 +69,10 @@ function App() {
 
   );
 }
+const styles = StyleSheet.create({
+  togglebutton: {
+    backgroundColor: 'red',
 
+  }
+})
 export default App;

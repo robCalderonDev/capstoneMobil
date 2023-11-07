@@ -43,7 +43,7 @@ export const loginValidationSchenaUser = yup.object().shape({
         .matches(/^[0-9]+[-|‐]{1}[0-9kK]{1}$/, 'Ingresa un rut válido'),
     comuna: yup
         .string()
-        .required('Ingresa tu calle porfavor'),
+        .required('Ingresa tu comuna porfavor'),
     calle: yup
         .string()
         .required('Ingresa tu calle porfavor'),
@@ -61,5 +61,18 @@ export const loginValidationSchenaUser = yup.object().shape({
         .string()
         .oneOf([yup.ref('password'), null], 'Contraseñas deben coincidir'),
 
+
+})
+
+export const formIncidenceschema = yup.object().shape({
+    incidenceTytpe: yup
+        .string()
+        .required('Elija tipo de incidencia porfavor'),
+    subject: yup
+        .string()
+        .required('Ingresa tu calle porfavor'),
+    description: yup
+        .string()
+        .required('Ingrese una descripción porfavor'),
 
 })

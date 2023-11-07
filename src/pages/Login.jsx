@@ -6,13 +6,13 @@ import { useNavigation } from '@react-navigation/native';
 import { useContext } from 'react';
 import { RecordContext } from '../context/context';
 import StyledTextInput from '../components/styled/StyledTextInput';
-import { doc, getDoc } from "firebase/firestore";
+import { Query, collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 
 
 
 const Login = () => {
 
-    const { loanding, setLoading, setdataUserDb } = useContext(RecordContext);
+    const { loanding, setLoading, setDataUserDb } = useContext(RecordContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigation = useNavigation(); // Obtiene el objeto navigation
@@ -37,29 +37,19 @@ const Login = () => {
             }
 
         } finally {
+
+
+
             setLoading(false);
-
-            if (auth.currentUser && auth.currentUser.uid) {
-                const idUser = auth.currentUser.uid;
-                let docRef = doc(FIRESTORE_DB, "estudiantes", idUser);
-                let docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    console.log("Document data estudiantes:", docSnap.data());
-                } else {
-                    docRef = doc(FIRESTORE_DB, "usuarios", idUser);
-                    docSnap = await getDoc(docRef);
-                    console.log("Document data normal:", docSnap.data());
-                }
-            }
-
-
         }
+
     }
     const navigateToSignUp = () => {
         //vacia los input al cambiar de pantalla
         setEmail('');
         setPassword('');
         navigation.navigate('SignUp')
+
     }
 
 

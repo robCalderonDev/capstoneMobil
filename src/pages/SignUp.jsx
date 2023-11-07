@@ -1,4 +1,4 @@
-import { ErrorMessage, Formik, useField } from 'formik'
+import { Formik, useField } from 'formik'
 import React, { useContext, useEffect } from 'react'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View, } from 'react-native'
 import { loginValidationSchena, loginValidationSchenaStudent, loginValidationSchenaUser } from '../validationSchemas/validationsForm'
@@ -13,7 +13,7 @@ import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestor
 import { Switch } from 'react-native-switch';
 import colegios from '../data/colegios.json';
 import { obtenerDataColegios } from '../helpers/parsinData'
-
+import cursos from '../data/cursos.js'
 import ModalForm from '../components/ModalForm'
 
 
@@ -34,11 +34,11 @@ const FormikInputValue = ({ name, ...props }) => {
 }
 
 const SignUp = () => {
-    const { regiones, choosedItem, loanding, setLoading, dataUserDb, setDataUserDb } = useContext(RecordContext);
+    const { regiones, choosedItem, loanding, setLoading, setDataUserDb, colegiosParseado, setColegiosParseado } = useContext(RecordContext);
     const [comunas, setComunas] = useState([]);
     const [cursosParse, setCursosParse] = useState([{}])
-    const [colegiosParseado, setColegiosParseado] = useState({})
-    const [isNormalUser, setIsNormalUser] = useState(false)
+
+    const [isStudent, setIsStudent] = useState(false)
     const [modalVisible, setModalVisible] = useState(true);
     const auth = FIREBASE_AUTH;//obtiene la autenticacion de firebase
     const initialValues = {//valores iniciales para el formulario 
@@ -82,13 +82,13 @@ const SignUp = () => {
         setCursosParse(dropdownData)
     }
 
-    const handleSubmitSignUp = async ({ nombre, email, password, rut, comuna, calle, apellido, colegio, curso }, setIsNormalUser) => {
+    const handleSubmitSignUp = async ({ nombre, email, password, rut, comuna, calle, apellido, colegio, curso }) => {
         try {
             const response = await createUserWithEmailAndPassword(auth, email, password);
             const userUid = response.user.uid;
 
             // Crea una referencia al documento del usuario utilizando su UID
-            const nameCollection = setIsNormalUser ? 'usuarios' : 'estudiantes';
+            const nameCollection = isStudent ? 'usuarios' : 'estudiantes';
             const collectionRef = collection(FIRESTORE_DB, nameCollection);
 
             if (nameCollection === 'estudiantes') {
@@ -97,14 +97,16 @@ const SignUp = () => {
                     apellido: apellido,
                     colegio: colegio,
                     curso: curso,
-                    email: email,
+                    email: email.toLowerCase(),
+                    rol: 'estudiante'
 
                 };
+                const userDocRef = doc(collectionRef, userUid);
                 // Establece los datos en el documento en Firestore
-                await addDoc(collectionRef, newUser);
+                await setDoc(userDocRef, newUser);
 
                 // Muestra un mensaje de éxito
-                ToastAndroid.show('Cuenta Creada', ToastAndroid.LONG);
+                ToastAndroid.show('Cuenta Creada estudiante', ToastAndroid.LONG);
                 // Puedes mostrar la respuesta de createUserWithEmailAndPassword si es necesario
                 setDataUserDb(newUser)
             }
@@ -115,14 +117,18 @@ const SignUp = () => {
                     rut: rut,
                     comuna: comuna,
                     calle: calle,
-                    email: email,
+                    email: email.toLowerCase(),
+                    rol: 'usuario'
 
                 };
                 // Establece los datos en el documento en Firestore
-                await addDoc(collectionRef, newUser);
+                const userDocRef = doc(collectionRef, userUid);
+                // Establece los datos en el documento en Firestore
+                await setDoc(userDocRef, newUser);
+
 
                 // Muestra un mensaje de éxito
-                ToastAndroid.show('Cuenta Creada', ToastAndroid.LONG);
+                ToastAndroid.show('Cuenta Creada normal', ToastAndroid.LONG);
                 setDataUserDb(newUser)
                 // Puedes mostrar la respuesta de createUserWithEmailAndPassword si es necesario
             }
@@ -131,8 +137,9 @@ const SignUp = () => {
 
         } catch (error) {
             // Maneja los errores, puedes mostrar mensajes de error o realizar otras acciones necesarias
-            console.log(error.message)
-            // ToastAndroid.show(error.message, ToastAndroid.LONG);
+
+
+            ToastAndroid.show(error.message, ToastAndroid.LONG);
         } finally {
             // Realiza acciones finales si es necesario
             setLoading(false);
@@ -141,22 +148,21 @@ const SignUp = () => {
 
     return (
         <Formik
-            validationSchema={isNormalUser ? loginValidationSchenaUser : loginValidationSchenaStudent}
+            validationSchema={isStudent ? loginValidationSchenaUser : loginValidationSchenaStudent}
             validateOnChange={false} // Disable validation every field change
             validateOnBlur={false} // Disable validation every field blur
             initialValues={initialValues}
             onSubmit={(values) => {
                 handleSubmitSignUp(values)
 
-                alert('paso')
 
             }}>
             {(props) => {
                 return (
                     <ScrollView style={styles.form}>
                         {modalVisible ? (
-                            <ModalForm setIsNormalUser={setIsNormalUser} setModalVisible={setModalVisible} modalVisible={modalVisible} />
-                        ) : (isNormalUser ? (
+                            <ModalForm setIsStudent={setIsStudent} setModalVisible={setModalVisible} modalVisible={modalVisible} />
+                        ) : (isStudent ? (
                             <>
                                 <FormikInputValue name='nombre' placeholder='Nombre' onChangeText={props.handleChange('nombre')} value={props.values.nombre} />
                                 <FormikInputValue name='apellido' placeholder='Apellido' onChangeText={props.handleChange('apellido')} value={props.values.apellido} />
@@ -239,16 +245,13 @@ const SignUp = () => {
                                     labelField="label"
                                     onChange={(item) => {
                                         props.setFieldValue('curso', item['label'])
-
-
-
-
                                     }}
 
                                 />
                                 {props.errors.curso && props.touched.curso && (
                                     <Text style={styles.error}>{props.errors.curso}</Text>
                                 )}
+
                                 <FormikInputValue name='email' placeholder='E-mail' onChangeText={props.handleChange('email')} value={props.values.email} />
                                 <FormikInputValue name='password' placeholder='Password' secureTextEntry onChangeText={props.handleChange('password')} value={props.values.password} />
                                 <FormikInputValue name='passwordConfirmation' placeholder='Confirm password' secureTextEntry />
@@ -261,55 +264,6 @@ const SignUp = () => {
                             </>
                         ))
                         }
-
-
-
-
-                        {/* <View style={styles.container}>
-
-                            <View style={styles.section}>
-                                <Checkbox
-                                    style={styles.checkbox}
-                                    value={isChecked}
-                                    onValueChange={setChecked}
-                                    color={isChecked ? '#39676E' : undefined}
-                                />
-                                <Text style={styles.paragraph}>Eres estudiante?</Text>
-                            </View>
-
-                        </View> */}
-
-                        {/* 
-                        <View style={styles.container}>
-                            <Text>Eres estudiante de educacion media?</Text>
-                            <Switch
-                                name='isStudent'
-                                backgroundActive={'#2b6e97'}
-                                backgroundInactive={'#dedede'}
-                                circleActiveColor={'#fff'}
-                                circleInActiveColor={'#fff'}
-                                onValueChange={(value) => {
-                                    props.setFieldValue("isStudent", value); // Actualiza el campo en Formik
-                                    setChecked(value);
-
-                                }}
-                                value={props.values.isStudent} // Debería coincidir con el campo en Formik
-                                onChange={() => props.setFieldValue("isStudent", !props.values.isStudent)}
-                                activeText={'Si'}
-                                inActiveText={'No'}
-                                switchLeftPx={5}
-                                switchRightPx={5}
-                                switchWidthMultiplier={1.8}
-                                switchBorderRadius={30}
-                            />
-
-
-                        </View>
-                     */}
-
-
-
-
 
                     </ScrollView>
                 )
@@ -373,10 +327,6 @@ const styles = StyleSheet.create({
 
         flexDirection: 'row',
     },
-    switch: {
-
-
-    }
 
 
 
