@@ -55,7 +55,7 @@ const FormIncidence = () => {
     const [location, setLocation] = useState({})
     const [image, setImage] = useState(null);
     const [urlImage, setUrlImage] = useState('')
-    const [loanding, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)
     const { colegiosParseado, setColegiosParseado, dataUserDb } = useContext(RecordContext);
     const [cordenadas, setCordenadas] = useState({ latitud: 0, longitud: 0 })
     const auth = FIREBASE_AUTH;
@@ -63,15 +63,16 @@ const FormIncidence = () => {
         const getPermission = async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
-                setErrorMsg('Please dar permisos para acceder a la ubica`cion');
+                setErrorMsg('Please dar permisos para acceder a la ubicacion');
                 return;
             }
             let currentLocation = await Location.getCurrentPositionAsync({});
             setLocation(currentLocation);
-            //console.log('Location: ', currentLocation)
+            console.log('Location: ', currentLocation)
         }
         getPermission()
         const colegioParseado = obtenerDataColegios(colegios)
+
         setColegiosParseado(colegioParseado)
 
 
@@ -131,27 +132,32 @@ const FormIncidence = () => {
     };
 
 
-    const selectSchool = (colegiosParseado) => {
-        const colegioStudent = colegiosParseado.find(colegio => colegio['NOMBRE ESTABLECIMIENTO'] === dataUserDb.colegio)
-
-        setCordenadas({ latitud: parseFloat(colegioStudent['LATITUD'].replace(',', '.')), longitud: parseFloat(colegioStudent['LONGITUD'].replace(',', '.')) })
-    }
-
-
 
 
     const navigation = useNavigation();
 
     const sentIncidence = async ({ incidenceTytpe, subject, description }) => {
-        await uploadMediaFile()
+        if (image) {
+            await uploadMediaFile()
+        }
+
+
+
+
+        const colegioStudent = colegiosParseado.find(colegio => colegio['NOMBRE ESTABLECIMIENTO'] === dataUserDb.colegio)
+        console.log(colegioStudent, 'colegioStudent')
+        setCordenadas({ latitud: parseFloat(colegioStudent['LATITUD'].replace(',', '.')), longitud: parseFloat(colegioStudent['LONGITUD'].replace(',', '.')) })
+
+
+
         const collectionRef = collection(FIRESTORE_DB, 'incidencia-estudiantil');
         const fechaTimestamp = Timestamp.fromDate(new Date());
-        //console.log('enviar', cordenadas, fechaTimestamp, incidenceTytpe, subject, description, auth.currentUser.uid)
+        console.log('enviar', cordenadas, fechaTimestamp, incidenceTytpe, subject, description, auth.currentUser.uid)
         const newUser = {
             idEstudiante: auth.currentUser.uid,
             titulo: subject,
             fecha: fechaTimestamp,
-            ubicacion: new GeoPoint(cordenadas['latitud'], cordenadas['longitud']),
+            ubicacion: new GeoPoint(parseFloat(colegioStudent['LATITUD'].replace(',', '.')), parseFloat(colegioStudent['LONGITUD'].replace(',', '.'))),
             evidencia: urlImage,
             descripcion: description,
             curso: dataUserDb.curso,
@@ -164,6 +170,7 @@ const FormIncidence = () => {
         await addDoc(collectionRef, newUser);
 
         ToastAndroid.show('Incidencia enviada correctamente', ToastAndroid.LONG);
+        console.log(cordenadas, 'cordenadas')
     }
 
     return (
@@ -173,7 +180,7 @@ const FormIncidence = () => {
             validateOnBlur={false} // Disable validation every field blur
             initialValues={initialValues}
             onSubmit={(values, { resetForm }) => {
-                selectSchool(colegiosParseado)
+
                 sentIncidence(values)
                 resetForm();
 

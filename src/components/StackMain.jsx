@@ -59,27 +59,44 @@ const StackMain = () => {
                 drawerActiveTintColor: 'white',
                 drawerInactiveTintColor: '#dedede',
                 drawerLabelStyle: { marginLeft: -15, fontSize: 15 },
+                unmountInactiveRoutes: true
 
             }} drawerContent={(props) => <CustomDrawerContent {...props} />} >
 
-                <Drawer.Screen name="Home" component={Home} options={{
-                    drawerIcon: ({ color }) => (<Ionicons name="home" size={24} color={color} />),
-                    headerStyle: {
-                        backgroundColor: '#1E1F22',
-                        // Cambia el color de fondo de la pantalla
-                    }, headerTintColor: 'white'
-                }} />
+                {dataUserDb.curso ? <>
+                    <Drawer.Screen name="Home" component={Home} options={{
+                        drawerIcon: ({ color }) => (<Ionicons name="home" size={24} color={color} />),
+                        headerStyle: {
+                            backgroundColor: '#1E1F22',
+                            // Cambia el color de fondo de la pantalla
+                        }, headerTintColor: 'white'
+                    }} />
+                    <Drawer.Screen name="Reportar Incidencia" component={Details} options={{
+                        drawerIcon: ({ color }) => (<Ionicons name="create-sharp" size={24} color={color} />),
+                        headerStyle: {
+                            backgroundColor: '#1E1F22',
+                            // Cambia el color de fondo de la pantalla
+                        }, headerTintColor: 'white'
+                    }} />
+
+                </> :
+                    <>
+
+                        <Drawer.Screen name="Home" component={Home} options={{
+                            drawerIcon: ({ color }) => (<Ionicons name="home" size={24} color={color} />),
+                            headerStyle: {
+                                backgroundColor: '#1E1F22',
+                                // Cambia el color de fondo de la pantalla
+                            }, headerTintColor: 'white'
+                        }} />
+                    </>
+                }
 
 
 
 
-                <Drawer.Screen name="Reportar Incidencia" component={Details} options={{
-                    drawerIcon: ({ color }) => (<Ionicons name="create-sharp" size={24} color={color} />),
-                    headerStyle: {
-                        backgroundColor: '#1E1F22',
-                        // Cambia el color de fondo de la pantalla
-                    }, headerTintColor: 'white'
-                }} />
+
+
 
 
 

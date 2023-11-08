@@ -34,7 +34,7 @@ const FormikInputValue = ({ name, ...props }) => {
 }
 
 const SignUp = () => {
-    const { regiones, choosedItem, loanding, setLoading, setDataUserDb, colegiosParseado, setColegiosParseado } = useContext(RecordContext);
+    const { regiones, choosedItem, loading, setLoading, setDataUserDb, colegiosParseado, setColegiosParseado } = useContext(RecordContext);
     const [comunas, setComunas] = useState([]);
     const [cursosParse, setCursosParse] = useState([{}])
 
@@ -125,20 +125,11 @@ const SignUp = () => {
                 const userDocRef = doc(collectionRef, userUid);
                 // Establece los datos en el documento en Firestore
                 await setDoc(userDocRef, newUser);
-
-
-                // Muestra un mensaje de éxito
                 ToastAndroid.show('Cuenta Creada normal', ToastAndroid.LONG);
                 setDataUserDb(newUser)
                 // Puedes mostrar la respuesta de createUserWithEmailAndPassword si es necesario
             }
-
-
-
         } catch (error) {
-            // Maneja los errores, puedes mostrar mensajes de error o realizar otras acciones necesarias
-
-
             ToastAndroid.show(error.message, ToastAndroid.LONG);
         } finally {
             // Realiza acciones finales si es necesario
@@ -192,7 +183,7 @@ const SignUp = () => {
                                 <FormikInputValue name='email' placeholder='E-mail' onChangeText={props.handleChange('email')} value={props.values.email} />
                                 <FormikInputValue name='password' placeholder='Password' secureTextEntry onChangeText={props.handleChange('password')} value={props.values.password} />
                                 <FormikInputValue name='passwordConfirmation' placeholder='Confirm password' secureTextEntry />
-                                {loanding ? <ActivityIndicator size='large' color='#0000dff' />
+                                {loading ? <ActivityIndicator size='large' color='#0000dff' />
                                     :
 
                                     <TouchableOpacity onPress={() => props.handleSubmit()} style={styles.touchableSignUp}>
@@ -255,7 +246,7 @@ const SignUp = () => {
                                 <FormikInputValue name='email' placeholder='E-mail' onChangeText={props.handleChange('email')} value={props.values.email} />
                                 <FormikInputValue name='password' placeholder='Password' secureTextEntry onChangeText={props.handleChange('password')} value={props.values.password} />
                                 <FormikInputValue name='passwordConfirmation' placeholder='Confirm password' secureTextEntry />
-                                {loanding ? <ActivityIndicator size='large' color='#0000dff' />
+                                {loading ? <ActivityIndicator size='large' color='#0000dff' />
                                     :
                                     <TouchableOpacity onPress={() => props.handleSubmit()} style={styles.touchableSignUp}>
                                         <Text style={styles.touchabletext}>Registrarse</Text>

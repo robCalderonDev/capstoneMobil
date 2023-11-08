@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "plugins": [
       [
@@ -34,11 +34,25 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#000000"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDn_-0N-NmEernLC8LjBzPF3SfEin_2qtY"
+        }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.robcalderonv.capstoneMobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e1d76697-28ab-4017-b28a-9fb1c5273271"
+      }
     }
   }
 }

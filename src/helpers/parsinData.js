@@ -1,4 +1,4 @@
-export const obtenerDataColegios = (colegios) => {//funcion para extraer el nombre del establecimiento y el rbd
+export const obtenerDataColegios = (colegios) => {//funcion para extraer el nombre del establecimiento,latitud,longitud y el rbd
     const resultados = [];
 
     for (let i = 0; i < colegios.length; i++) {

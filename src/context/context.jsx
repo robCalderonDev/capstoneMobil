@@ -9,7 +9,7 @@ export const RecordContext = createContext(null);
 const RecordProvider = ({ children }) => {
 
     const [choosedItem, setChoosedItem] = useState('Región Metropolitana de Santiago');
-    const [loanding, setLoading] = useState('');
+    const [loading, setLoading] = useState('');
     const [dataUserDb, setDataUserDb] = useState({})
     const [user, setUser] = useState(null)
     const [colegiosParseado, setColegiosParseado] = useState({})
@@ -58,7 +58,7 @@ const RecordProvider = ({ children }) => {
                 regiones,
                 choosedItem,
                 setChoosedItem,
-                loanding,
+                loading,
                 setLoading,
                 dataUserDb,
                 setDataUserDb,

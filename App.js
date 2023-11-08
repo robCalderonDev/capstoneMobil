@@ -3,7 +3,7 @@
 import 'react-native-gesture-handler';
 import { useEffect, useState } from 'react';
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { User, onAuthStateChanged } from 'firebase/auth';
@@ -27,19 +27,30 @@ import StackMain from './src/components/StackMain';
 const Stack = createNativeStackNavigator();
 
 
-
+const LoadingScreen = () => {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E1F22' }}>
+      <ActivityIndicator style={{ transform: [{ scaleX: 3 }, { scaleY: 3 }] }} color='#2F5A73' />
+    </View>
+  );
+};
 
 
 
 function App() {
   const [user, setUser] = useState(null)
-
+  const [loading, setLoading] = useState(true); // Nuevo estado de carga
 
   useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, (user) => {
-
+    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
       setUser(user);
-    })
+      setLoading(false); // Marcar como no cargando una vez que se determine el estado de autenticación
+    });
+
+    return () => {
+      unsubscribe();
+    };
+
   }, [])
   return (
     <>
@@ -47,26 +58,26 @@ function App() {
       <RecordProvider>
         <NavigationContainer>
           <Stack.Navigator initialRouteName='Login'>
-            {user ? (
+            {loading ? (
+              // Muestra un indicador de carga mientras se verifica el estado
+              <Stack.Screen name='Loading' component={LoadingScreen} options={{ headerShown: false }} />
+            ) : user ? (
               <Stack.Screen name='Main' component={StackMain} options={{ headerShown: false }} />
-
-            ) : (<>
-              <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
-              <Stack.Screen name='SignUp' component={SignUp} options={{
-                // Oculta el encabezado
-                headerStyle: {
-                  backgroundColor: '#1E1F22',
-                  // Cambia el color de fondo de la pantalla
-                }, headerTintColor: 'white'
-              }} />
-
-            </>)}
-
+            ) : (
+              <>
+                <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
+                <Stack.Screen name='SignUp' component={SignUp} options={{
+                  headerStyle: {
+                    backgroundColor: '#1E1F22',
+                  },
+                  headerTintColor: 'white'
+                }} />
+              </>
+            )}
           </Stack.Navigator>
         </NavigationContainer>
       </RecordProvider>
     </>
-
   );
 }
 const styles = StyleSheet.create({
