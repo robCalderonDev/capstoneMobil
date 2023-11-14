@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
 
     },
     selectedTextStyle: {
-        color: 'gray', // Cambia el color de texto seleccionado en el Dropdown
+        color: 'gray', // Cambia el color de texto seleccionado en el Dropdownsdsd
     },
     inputSearchStyle: {
         color: 'green', // Cambia el color de texto en el campo de búsqueda
