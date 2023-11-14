@@ -54,7 +54,7 @@ const Login = () => {
 
 
     return (
-        <KeyboardAvoidingView behavior='height' style={styles.container}>
+        <KeyboardAvoidingView style={styles.container} behavior="padding">
             <Image
                 source={require('./../img/logo.png')}
                 style={{
@@ -76,7 +76,7 @@ const Login = () => {
                 value={email}
                 onChangeText={(text) => setEmail(text)}
                 style={styles.input}
-                placeholder='Email'
+                placeholder='Correo'
                 autoCapitalize='none'
                 placeholderTextColor={'#fff'}
             />
@@ -85,14 +85,17 @@ const Login = () => {
                 value={password}
                 onChangeText={(text) => setPassword(text)}
                 style={styles.input}
-                placeholder='Password'
+                placeholder='Contraseña'
                 autoCapitalize='none'
                 secureTextEntry={true}
                 placeholderTextColor={'#fff'}
             />
 
             <View style={styles.reset}>
-                <Text style={styles.textStyle}>Olvidaste tu contrasena?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('RessetPassword')}>
+                    <Text style={styles.textStyle}>Olvidaste tu contraseña?</Text>
+
+                </TouchableOpacity>
             </View>
 
             {loanding ? (
@@ -119,7 +122,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#1E1F22'
+        backgroundColor: '#1E1F22',
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
         // Color en formato hexadecimal
     },
     logo: {

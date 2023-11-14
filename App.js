@@ -19,6 +19,7 @@ import RecordProvider from './src/context/context';
 import { DrawerToggleButton } from '@react-navigation/drawer';
 import { StatusBar } from 'expo-status-bar';
 import StackMain from './src/components/StackMain';
+import RessetPassword from './src/pages/RessetPassword';
 
 
 
@@ -60,16 +61,34 @@ function App() {
           <Stack.Navigator initialRouteName='Login'>
             {loading ? (
               // Muestra un indicador de carga mientras se verifica el estado
-              <Stack.Screen name='Loading' component={LoadingScreen} options={{ headerShown: false }} />
+              <>
+                <Stack.Screen name='Loading' component={LoadingScreen} options={{ headerShown: false }} />
+
+
+              </>
+
+
+
             ) : user ? (
               <Stack.Screen name='Main' component={StackMain} options={{ headerShown: false }} />
+
             ) : (
               <>
                 <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
+                <Stack.Screen name='RessetPassword' component={RessetPassword}
+                  options={{
+                    headerStyle: {
+                      backgroundColor: '#1E1F22',
+                    },
+                    title: 'Cambiar contraseña',
+                    headerTintColor: 'white'
+                  }}
+                />
                 <Stack.Screen name='SignUp' component={SignUp} options={{
                   headerStyle: {
                     backgroundColor: '#1E1F22',
                   },
+                  title: 'Registrarse',
                   headerTintColor: 'white'
                 }} />
               </>

@@ -191,6 +191,7 @@ const FormIncidence = () => {
             {(props) => {
                 return (
                     <ScrollView style={styles.container}>
+
                         <Text>Formulario de Incidencia</Text>
                         <Text style={styles.HeaderInput}>Tipo de Incidencia</Text>
                         <Dropdown
@@ -216,8 +217,9 @@ const FormIncidence = () => {
                             <Text style={styles.error}>{props.errors.incidenceTytpe}</Text>
                         )}
 
-
-                        <FormikInputValueIncidence name='subject' placeholder='Asunto' onChangeText={props.handleChange('subject')} value={props.values.subject} />
+                        <Text style={styles.HeaderInput}>Asunto</Text>
+                        <FormikInputValueIncidence name='subject' placeholder='Ejemplo: pelea en la biblioteca' onChangeText={props.handleChange('subject')} value={props.values.subject} />
+                        <Text style={styles.HeaderInput}>Descripcion</Text>
                         <FormikInputValueIncidence
                             name='description'
                             placeholder='Describe lo que sucedio'
@@ -273,9 +275,15 @@ const FormIncidence = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+
+        // Centra verticalment
+        paddingHorizontal: 40,
+
     },
     HeaderInput: {
         color: '#dedede',
+        marginBottom: 10,
+
     },
     dropdown: {
         height: 50,
@@ -283,10 +291,11 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderRadius: 8,
         backgroundColor: 'white',
-        width: '90%',
+        width: '100%',
         paddingHorizontal: 20,
         paddingVertical: 10,
         marginBottom: 10,
+
 
     },
     selectedTextStyle: {
@@ -304,7 +313,7 @@ const styles = StyleSheet.create({
     },
     buttonSelect: {
         backgroundColor: '#314196',
-        width: '90%',
+        width: '100%',
         height: 50,
         marginVertical: 20,
 
@@ -312,7 +321,7 @@ const styles = StyleSheet.create({
     },
     buttonUpload: {
         backgroundColor: "#56AF85",
-        width: '90%',
+        width: '100%',
         height: 50,
 
 

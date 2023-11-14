@@ -97,7 +97,7 @@ const SignUp = () => {
                     apellido: apellido,
                     colegio: colegio,
                     curso: curso,
-                    email: email.toLowerCase(),
+                    mail: email.toLowerCase(),
                     rol: 'estudiante'
 
                 };
@@ -117,7 +117,7 @@ const SignUp = () => {
                     rut: rut,
                     comuna: comuna,
                     calle: calle,
-                    email: email.toLowerCase(),
+                    mail: email.toLowerCase(),
                     rol: 'usuario'
 
                 };
@@ -155,6 +155,7 @@ const SignUp = () => {
                             <ModalForm setIsStudent={setIsStudent} setModalVisible={setModalVisible} modalVisible={modalVisible} />
                         ) : (isStudent ? (
                             <>
+
                                 <FormikInputValue name='nombre' placeholder='Nombre' onChangeText={props.handleChange('nombre')} value={props.values.nombre} />
                                 <FormikInputValue name='apellido' placeholder='Apellido' onChangeText={props.handleChange('apellido')} value={props.values.apellido} />
                                 <FormikInputValue name='rut' placeholder='Rut' onChangeText={props.handleChange('rut')} value={props.values.rut} />
@@ -274,6 +275,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#1E1F22',
 
     },
+
     touchableSignUp: {
         width: '80%',
         height: 50,
@@ -292,7 +294,7 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderRadius: 8,
         backgroundColor: 'white',
-        width: '80%',
+        width: '100%',
         height: 50,
         paddingHorizontal: 20,
         paddingVertical: 10,

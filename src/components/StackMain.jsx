@@ -69,14 +69,18 @@ const StackMain = () => {
                         headerStyle: {
                             backgroundColor: '#1E1F22',
                             // Cambia el color de fondo de la pantalla
-                        }, headerTintColor: 'white'
+
+
+                        }, headerTintColor: 'white',
+                        headerShadowVisible: false,
                     }} />
                     <Drawer.Screen name="Reportar Incidencia" component={Details} options={{
                         drawerIcon: ({ color }) => (<Ionicons name="create-sharp" size={24} color={color} />),
                         headerStyle: {
                             backgroundColor: '#1E1F22',
                             // Cambia el color de fondo de la pantalla
-                        }, headerTintColor: 'white'
+                        }, headerTintColor: 'white',
+                        headerShadowVisible: false,
                     }} />
 
                 </> :
@@ -87,7 +91,8 @@ const StackMain = () => {
                             headerStyle: {
                                 backgroundColor: '#1E1F22',
                                 // Cambia el color de fondo de la pantalla
-                            }, headerTintColor: 'white'
+                            }, headerTintColor: 'white',
+                            headerShadowVisible: false,
                         }} />
                     </>
                 }

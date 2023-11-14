@@ -1,10 +1,9 @@
-import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { Alert, Modal, StyleSheet, Text, Pressable, View } from 'react-native';
+import { Alert, Modal, StyleSheet, Text, Pressable, View, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 
-const ModalForm = ({ setIsStudent, modalVisible, setModalVisible }) => {
-    const navigation = useNavigation()
+const ModalReset = ({ modalVisible, setModalVisible, email, setEmail }) => {
+
     return (
         <View style={styles.centeredView}>
             <Modal
@@ -12,25 +11,35 @@ const ModalForm = ({ setIsStudent, modalVisible, setModalVisible }) => {
                 transparent={true}
                 visible={modalVisible}
                 onRequestClose={() => {
-                    navigation.navigate('Login')
+
                     setModalVisible(!modalVisible);
                 }}>
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Eres estudiante?</Text>
+                        <View style={styles.titleContainer}>
+                            <Text style={styles.modalTitle}>Correo de recuperacion enviado</Text>
+                            <Image
+                                source={require('./../img/check.png')}
+                                style={{
+                                    width: 25, // Ajusta el ancho de la imagen
+                                    height: 25, // Ajusta la altura de la imagen
+                                    marginTop: -2.5,
+                                    marginLeft: 10,
+
+                                }}
+                            />
+                        </View>
+
+                        <Text style={styles.modalText}>Hemos enviado instrucciones para cambiar la contraseña a <Text style={styles.mail}>{email}</Text>. Revisa tu bandeja de entrada</Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity style={styles.touchableOpacity1} onPress={() => {
-                                setIsStudent(false);
+
                                 setModalVisible(!modalVisible);
+                                setEmail('');
                             }}>
-                                <Text style={styles.text}>Si</Text>
+                                <Text style={styles.text}>Vale</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.touchableOpacity} onPress={() => {
-                                setIsStudent(true);
-                                setModalVisible(!modalVisible);
-                            }}>
-                                <Text style={styles.text}>No</Text>
-                            </TouchableOpacity>
+
                         </View>
 
                     </View>
@@ -42,6 +51,9 @@ const ModalForm = ({ setIsStudent, modalVisible, setModalVisible }) => {
 };
 
 const styles = StyleSheet.create({
+    mail: {
+        fontWeight: 'bold',
+    },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
@@ -64,7 +76,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         padding: 35,
         width: '80%',
-        height: '20%',
+        height: '30%',
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {
@@ -76,46 +88,33 @@ const styles = StyleSheet.create({
         elevation: 5,
 
     },
-    button: {
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
-    },
     touchableOpacity1: {
         backgroundColor: '#56AF84',
-        marginRight: 20,
+
         height: 40,
-        width: '25%',
+        width: '40%',
         borderRadius: 2,
 
     },
-    touchableOpacity: {
-        backgroundColor: '#2F5A73',
-        borderRadius: 2,
-        height: 40,
-        width: '25%',
-        borderRadius: 2,
-
-
-    },
-    buttonOpen: {
-        backgroundColor: '#F194FF',
-    },
-    buttonClose: {
-        backgroundColor: '#2196F3',
-    },
-    textStyle: {
+    modalTitle: {
+        marginBottom: 15,
+        textAlign: 'center',
+        fontSize: 15,
         color: 'white',
         fontWeight: 'bold',
-        textAlign: 'center',
     },
     modalText: {
         marginBottom: 15,
         textAlign: 'center',
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 15,
         color: 'white',
+
     },
+    titleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    }
+
 });
 
-export default ModalForm;
+export default ModalReset;

@@ -9,7 +9,7 @@ export const RecordContext = createContext(null);
 const RecordProvider = ({ children }) => {
 
     const [choosedItem, setChoosedItem] = useState('Región Metropolitana de Santiago');
-    const [loading, setLoading] = useState('');
+    const [loading, setLoading] = useState(false);
     const [dataUserDb, setDataUserDb] = useState({})
     const [user, setUser] = useState(null)
     const [colegiosParseado, setColegiosParseado] = useState({})
