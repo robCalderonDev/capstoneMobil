@@ -4,63 +4,22 @@ import { StyleSheet, Text, View } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import { FIRESTORE_DB } from '../FirebaseConfig'
 import { collection, onSnapshot } from 'firebase/firestore'
-
-const getAllIncidence = async () => {
-    const collectionRef = FIRESTORE_DB('nombre_de_tu_coleccion');
-
-    // Realiza la consulta para obtener todos los documentos de la colección
-    collectionRef.get()
-        .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                // Accede a los datos de cada documento
-                const data = doc.data();
-                console.log('Documento ID:', doc.id);
-                console.log('Datos:', data);
-            });
-        })
-        .catch((error) => {
-            console.error('Error al obtener los documentos:', error);
-        });
-}
+import { useContext } from 'react'
+import { RecordContext } from '../context/context'
+import ModalIncidence from './modals/ModalIncidence'
 
 
 
-let locationsOfInterest = [
-    {
-        title: 'Casa',
-        location: {
-            latitude: -33.5230525,
-            longitude: -70.65371052,
-        },
-        description: 'Prueba1',
-
-    },
-    {
-        title: 'colegio',
-        location: {
-            latitude: -33.55178,
-            longitude: -70.64509,
-        },
-        description: 'Prueba2',
-
-    }, {
-        title: 'otro colegio',
-        location: {
-            latitude: -33.67046,
-            longitude: -70.93788,
-        },
-        description: 'Prueba3',
-
-    }
-]
 
 
 const Maps = () => {
-
-    const [docs, setdocs] = useState([])
+    const { docs, setdocs } = useContext(RecordContext);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [itemSelected, setItemSelected] = useState({});
 
     useEffect(() => {
-        const unsub = onSnapshot(collection(FIRESTORE_DB, 'incidencia-estudiantil'), (querySnapshot) => {
+
+        const dataIncidences = onSnapshot(collection(FIRESTORE_DB, 'incidencia-estudiantil'), (querySnapshot) => {
             const documents = querySnapshot.docs.map((doc) => {
                 return {
                     ...doc.data(),
@@ -68,8 +27,9 @@ const Maps = () => {
                 }
             });
             setdocs(documents);
+            console.log("bu2g")
         });
-        return () => unsub();
+        () => dataIncidences();
     }, [])
 
     const showLocationsOfInterest = () => {
@@ -78,9 +38,12 @@ const Maps = () => {
         return docs.map((item, index) => {
             return (
                 <Marker
+                    onPress={() => {
+                        setModalVisible(true);
+                        setItemSelected(item);
+                    }}
                     key={item.id}
-                    title={item.titulo}
-                    description={item.descripcion}
+
                     coordinate={{
                         longitude: item.ubicacion.longitude ? item.ubicacion.longitude : 0,
                         latitude: item.ubicacion.latitude ? item.ubicacion.latitude : 0
@@ -96,20 +59,23 @@ const Maps = () => {
     }
 
     return (
+        <>
+            <MapView
+                style={style.map}
 
-        <MapView
-            style={style.map}
+                initialRegion={{
+                    latitude: -33.45468201063936,
+                    longitude: -70.65908985212445,
+                    latitudeDelta: 0.25080673141022913,
+                    longitudeDelta: 0.15615183860064974,
+                }}
+            >
+                {showLocationsOfInterest()}
 
-            initialRegion={{
-                latitude: -33.45468201063936,
-                longitude: -70.65908985212445,
-                latitudeDelta: 0.25080673141022913,
-                longitudeDelta: 0.15615183860064974,
-            }}
-        >
-            {showLocationsOfInterest()}
+            </MapView>
+            <ModalIncidence modalVisible={modalVisible} setModalVisible={setModalVisible} itemSelected={itemSelected} />
+        </>
 
-        </MapView>
 
     )
 }

@@ -1,7 +1,7 @@
 import { createContext, useState, } from "react";
 import regiones from "../data/regiones";
 import { Text } from "react-native";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../FirebaseConfig";
 
 export const RecordContext = createContext(null);
@@ -13,6 +13,8 @@ const RecordProvider = ({ children }) => {
     const [dataUserDb, setDataUserDb] = useState({})
     const [user, setUser] = useState(null)
     const [colegiosParseado, setColegiosParseado] = useState({})
+
+    const [docs, setdocs] = useState([])
     const auth = FIREBASE_AUTH;
 
     ; // Reemplaza 'tuDocumentoID' con el ID del documento que deseas buscar
@@ -52,6 +54,11 @@ const RecordProvider = ({ children }) => {
         }
     }
 
+
+
+
+
+
     return (
         <RecordContext.Provider
             value={{
@@ -66,7 +73,10 @@ const RecordProvider = ({ children }) => {
                 setUser,
                 colegiosParseado,
                 setColegiosParseado,
-                getDataUser
+                getDataUser,
+                docs,
+                setdocs,
+
 
 
             }}

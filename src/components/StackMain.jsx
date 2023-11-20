@@ -9,10 +9,12 @@ import { RecordContext } from '../context/context';
 import { FIREBASE_AUTH } from '../FirebaseConfig';
 import { View, Text, TouchableOpacity, ToastAndroid } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import DashBoard from '../pages/DashBoard';
 import { AntDesign } from '@expo/vector-icons';
-
+import MapsPages from '../pages/MapsPages';
 const Drawer = createDrawerNavigator();
-
+import { Entypo } from '@expo/vector-icons';
 
 
 
@@ -52,10 +54,10 @@ const StackMain = () => {
             <Drawer.Navigator initialRouteName="Home" screenOptions={{
                 drawerPosition: 'right',
                 headerLeft: false,
-                drawerStyle: { backgroundColor: '#2B2D31', paddingTop: 25 },
+                drawerStyle: { backgroundColor: '#272b34', paddingTop: 25 },
                 headerRight: () => <DrawerToggleButton tintColor={'white'} />,
                 drawerActiveBackgroundColor: '#313338',
-                drawerInactiveBackgroundColor: '#2B2D31',
+                drawerInactiveBackgroundColor: '#272b34',
                 drawerActiveTintColor: 'white',
                 drawerInactiveTintColor: '#dedede',
                 drawerLabelStyle: { marginLeft: -15, fontSize: 15 },
@@ -93,7 +95,30 @@ const StackMain = () => {
                                 // Cambia el color de fondo de la pantalla
                             }, headerTintColor: 'white',
                             headerShadowVisible: false,
+                            headerTitleAlign: 'center', // Centra el título en el header
                         }} />
+                        <Drawer.Screen name="Maps" component={MapsPages} options={{
+                            drawerIcon: ({ color }) => (<Entypo name="map" size={24} color="white" />),
+                            headerStyle: {
+                                backgroundColor: '#1E1F22',
+                                // Cambia el color de fondo de la pantalla
+                            }, headerTintColor: 'white',
+                            headerShadowVisible: false,
+                            headerTitleAlign: 'center', // Centra el título en el header
+                            headerTitle: 'Mapa'
+
+                        }} />
+                        <Drawer.Screen name="Dashboard" component={DashBoard} options={{
+                            drawerIcon: ({ color }) => (<AntDesign name="dashboard" size={24} color="white" />),
+                            headerStyle: {
+                                backgroundColor: '#1E1F22',
+                                // Cambia el color de fondo de la pantalla
+                            }, headerTintColor: 'white',
+                            headerShadowVisible: false,
+                            headerTitleAlign: 'center', // Centra el título en el header
+
+                        }} />
+
                     </>
                 }
 
