@@ -2,7 +2,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { Formik, useField } from 'formik';
 import React, { useEffect } from 'react';
-import { Text, View, Button, StyleSheet, TextInput, ScrollView, Image, Alert, ToastAndroid } from 'react-native';
+import { Text, View, Button, StyleSheet, TextInput, ScrollView, Image, Alert, ToastAndroid, ActivityIndicator } from 'react-native';
 import { formIncidenceschema, } from '../validationSchemas/validationsForm';
 import * as DocumentPicker from 'expo-document-picker';
 import { getFirestore, Timestamp, GeoPoint, addDoc } from 'firebase/firestore';
@@ -31,7 +31,8 @@ initialValues = {
     description: '',
     fecha: '',
     idEstudiante: '',
-    file: ''
+    file: '',
+    categoriaIncidencia: ''
 }
 
 const FormikInputValueIncidence = ({ name, ...props }) => {
@@ -80,6 +81,7 @@ const FormIncidence = () => {
 
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
+        setLoading(true);
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
@@ -91,6 +93,7 @@ const FormIncidence = () => {
         if (!result.canceled) {
             setImage(result.assets[0].uri);
         }
+        setLoading(false);
     };
 
     const uploadMediaFile = async () => {
@@ -132,11 +135,15 @@ const FormIncidence = () => {
     };
 
 
-
+    const categoriaIncidencia = [{ label: 'Acoso', value: 'Acoso' },
+    { label: 'Accidente', value: 'Accidente' },
+    { label: 'Evidencia', value: 'Evidencia' },
+    { label: 'Alerta', value: 'Alerta' },
+    { label: 'Otro', value: 'Otro' },]
 
     const navigation = useNavigation();
 
-    const sentIncidence = async ({ incidenceTytpe, subject, description }) => {
+    const sentIncidence = async ({ incidenceTytpe, subject, description, categoriaIncidencia }) => {
         if (image) {
             await uploadMediaFile()
         }
@@ -152,7 +159,7 @@ const FormIncidence = () => {
 
         const collectionRef = collection(FIRESTORE_DB, 'incidencia-estudiantil');
         const fechaTimestamp = Timestamp.fromDate(new Date());
-        console.log('enviar', cordenadas, fechaTimestamp, incidenceTytpe, subject, description, auth.currentUser.uid)
+        console.log('enviar', cordenadas, fechaTimestamp, incidenceTytpe, categoriaIncidencia, subject, description, auth.currentUser.uid)
         const newUser = {
             idEstudiante: auth.currentUser.uid,
             titulo: subject,
@@ -161,6 +168,7 @@ const FormIncidence = () => {
             evidencia: urlImage,
             descripcion: description,
             curso: dataUserDb.curso,
+            categoriaIncidencia: categoriaIncidencia
 
 
 
@@ -183,7 +191,7 @@ const FormIncidence = () => {
 
                 sentIncidence(values)
                 resetForm();
-
+                console.log(values, 'values')
 
 
             }}>
@@ -213,6 +221,7 @@ const FormIncidence = () => {
                             }}
 
                         />
+
                         {props.errors.incidenceTytpe && props.touched.incidenceTytpe && (
                             <Text style={styles.error}>{props.errors.incidenceTytpe}</Text>
                         )}
@@ -227,6 +236,29 @@ const FormIncidence = () => {
                             value={props.values.description}
                             multiline={true}
                             numberOfLines={4} />
+                        <Text style={styles.HeaderInput}>Categoria de Incidencia</Text>
+                        <Dropdown
+
+                            style={styles.dropdown}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            name='categoriaIncidencia'
+                            data={categoriaIncidencia}
+                            maxHeight={300}
+                            placeholder="..."
+                            searchPlaceholder="Buscar..."
+                            valueField="value"
+                            labelField="label"
+                            onChange={(item) => {
+                                props.setFieldValue('categoriaIncidencia', item.label);
+                                console.log(item.label, 'item')
+                            }}
+
+                        />
+                        {props.errors.categoriaIncidencia && props.touched.categoriaIncidencia && (
+                            <Text style={styles.error}>{props.errors.categoriaIncidencia}</Text>
+                        )}
 
                         <TouchableOpacity onPress={pickImage} style={styles.buttonSelect}>
                             {
@@ -256,12 +288,13 @@ const FormIncidence = () => {
 
 
                         {/* {image && <Image source={{ uri: image }} style={{ width: "100%", height: 200 }} />} */}
+                        {loading ? <ActivityIndicator size='large' color='#0000dff' /> :
+                            <TouchableOpacity style={styles.buttonUpload} onPress={() => props.handleSubmit()}>
 
-                        <TouchableOpacity style={styles.buttonUpload} onPress={() => props.handleSubmit()}>
+                                <Text style={styles.textButtonEnviar}>Enviar</Text>
 
-                            <Text style={styles.textButtonEnviar}>Enviar</Text>
+                            </TouchableOpacity>}
 
-                        </TouchableOpacity>
                     </ScrollView>
                 )
 

@@ -65,7 +65,7 @@ const StackMain = () => {
 
             }} drawerContent={(props) => <CustomDrawerContent {...props} />} >
 
-                {dataUserDb.curso ? <>
+                {dataUserDb.rol === "estudiante" ? <>
                     <Drawer.Screen name="Home" component={Home} options={{
                         drawerIcon: ({ color }) => (<Ionicons name="home" size={24} color={color} />),
                         headerStyle: {

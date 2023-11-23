@@ -73,6 +73,7 @@ const ResumeDashboard = () => {
                 onPress={() => {
                     setModalVisible(true);
                     setItemSelected(item);
+
                 }}
                 key={item.id}
             >
@@ -110,7 +111,7 @@ const ResumeDashboard = () => {
                         </View>
                     </View>
                     <View style={{ width: '50%', justifyContent: 'center', alignItems: 'center' }}>
-                        <Text style={{ color: '#D14747', fontWeight: 'bold', fontSize: 25, marginVertical: 10 }}>+{count}</Text>
+                        <Text style={{ color: '#D14747', fontWeight: 'bold', fontSize: 25, marginVertical: 10 }}>+ {count}</Text>
 
                         <Text style={styles.descripcionCardIncidence}>Incidencias</Text>
 

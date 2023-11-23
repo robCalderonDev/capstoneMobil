@@ -68,6 +68,9 @@ export const formIncidenceschema = yup.object().shape({
     incidenceTytpe: yup
         .string()
         .required('Elija tipo de incidencia porfavor'),
+    categoriaIncidencia: yup
+        .string()
+        .required('Elija tipo de incidencia porfavor'),
     subject: yup
         .string()
         .required('Ingresa tu calle porfavor'),
