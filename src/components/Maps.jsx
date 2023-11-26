@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import { FIRESTORE_DB } from '../FirebaseConfig'
-import { collection, onSnapshot } from 'firebase/firestore'
+import { collection, onSnapshot, query, where } from 'firebase/firestore'
 import { useContext } from 'react'
 import { RecordContext } from '../context/context'
 import ModalIncidence from './modals/ModalIncidence'
@@ -13,13 +13,16 @@ import ModalIncidence from './modals/ModalIncidence'
 
 
 const Maps = () => {
-    const { docs, setdocs } = useContext(RecordContext);
+    const { docs, setdocs, dataUserDb } = useContext(RecordContext);
     const [modalVisible, setModalVisible] = useState(false);
     const [itemSelected, setItemSelected] = useState({});
 
     useEffect(() => {
+        const q = dataUserDb.rol === 'directorcomunidad' ? query(collection(FIRESTORE_DB, 'incidencias'),
+            where('incidenceType', '==', 'Comunitaria')
+        ) : query(collection(FIRESTORE_DB, 'incidencias'), where('incidenceType', '==', 'Academica'))
 
-        const dataIncidences = onSnapshot(collection(FIRESTORE_DB, 'incidencia-estudiantil'), (querySnapshot) => {
+        const dataIncidences = onSnapshot(q, (querySnapshot) => {
             const documents = querySnapshot.docs.map((doc) => {
                 return {
                     ...doc.data(),

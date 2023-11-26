@@ -89,7 +89,8 @@ function App() {
                     backgroundColor: '#1E1F22',
                   },
                   title: 'Registrarse',
-                  headerTintColor: 'white'
+                  headerTintColor: 'white',
+                  headerTitle: ''
                 }} />
               </>
             )}

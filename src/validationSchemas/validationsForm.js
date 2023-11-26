@@ -65,7 +65,7 @@ export const loginValidationSchenaUser = yup.object().shape({
 })
 
 export const formIncidenceschema = yup.object().shape({
-    incidenceTytpe: yup
+    incidenceType: yup
         .string()
         .required('Elija tipo de incidencia porfavor'),
     categoriaIncidencia: yup
@@ -73,9 +73,10 @@ export const formIncidenceschema = yup.object().shape({
         .required('Elija tipo de incidencia porfavor'),
     subject: yup
         .string()
-        .required('Ingresa tu calle porfavor'),
+        .required('Ingresa una descipcion porfavor'),
     description: yup
         .string()
         .required('Ingrese una descripción porfavor'),
+
 
 })

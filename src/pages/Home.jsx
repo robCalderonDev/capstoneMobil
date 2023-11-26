@@ -60,7 +60,7 @@ const Home = () => {
         <View style={styles.container}>
             {loading ? (
                 <ActivityIndicator size='large' color='#0000dff' />
-            ) : dataUserDb.rol === 'admin' ? (
+            ) : dataUserDb.rol === 'directorgeneral' || dataUserDb.rol === 'directorescuela' || dataUserDb.rol === 'directorcomunidad' ? (
                 <>
                     <ResumeDashboard />
 

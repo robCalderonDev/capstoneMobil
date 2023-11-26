@@ -23,10 +23,10 @@ import * as FileSystem from 'expo-file-system';
 
 
 
-const incidencesType = [{ label: 'Academica', value: 'Academica' }]
+const incidencesType = [{ label: 'Academica', value: 'Academica' }, { label: 'Comunitaria', value: 'Comunitaria' }]
 // , { label: 'comunitaria', value: 'comuntaria' },
-initialValues = {
-    incidenceTytpe: '',
+const initialValues = {
+    incidenceType: '',
     subject: '',
     description: '',
     fecha: '',
@@ -34,6 +34,7 @@ initialValues = {
     file: '',
     categoriaIncidencia: ''
 }
+
 
 const FormikInputValueIncidence = ({ name, ...props }) => {
     const [field, meta, helpers] = useField(name)
@@ -57,8 +58,10 @@ const FormIncidence = () => {
     const [image, setImage] = useState(null);
     const [urlImage, setUrlImage] = useState('')
     const [loading, setLoading] = useState(false)
+    const [type, setType] = useState()
     const { colegiosParseado, setColegiosParseado, dataUserDb } = useContext(RecordContext);
-    const [cordenadas, setCordenadas] = useState({ latitud: 0, longitud: 0 })
+
+    const [colegioChoose, setColegioChoose] = useState({})
     const auth = FIREBASE_AUTH;
     useEffect(() => {
         const getPermission = async () => {
@@ -81,7 +84,7 @@ const FormIncidence = () => {
 
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
-        setLoading(true);
+
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
@@ -93,10 +96,11 @@ const FormIncidence = () => {
         if (!result.canceled) {
             setImage(result.assets[0].uri);
         }
-        setLoading(false);
+
     };
 
     const uploadMediaFile = async () => {
+
         setLoading(true);
         try {
             const { uri } = await FileSystem.getInfoAsync(image);
@@ -135,7 +139,7 @@ const FormIncidence = () => {
     };
 
 
-    const categoriaIncidencia = [{ label: 'Acoso', value: 'Acoso' },
+    const categoriasIncidencia = [{ label: 'Acoso', value: 'Acoso' },
     { label: 'Accidente', value: 'Accidente' },
     { label: 'Evidencia', value: 'Evidencia' },
     { label: 'Alerta', value: 'Alerta' },
@@ -143,42 +147,55 @@ const FormIncidence = () => {
 
     const navigation = useNavigation();
 
-    const sentIncidence = async ({ incidenceTytpe, subject, description, categoriaIncidencia }) => {
+    const sentIncidence = async ({ incidenceType, subject, description, categoriaIncidencia }) => {
         if (image) {
             await uploadMediaFile()
+
         }
 
+
+        console.log(colegioChoose, 'colegiochooooose')
 
 
 
         const colegioStudent = colegiosParseado.find(colegio => colegio['NOMBRE ESTABLECIMIENTO'] === dataUserDb.colegio)
-        console.log(colegioStudent, 'colegioStudent')
-        setCordenadas({ latitud: parseFloat(colegioStudent['LATITUD'].replace(',', '.')), longitud: parseFloat(colegioStudent['LONGITUD'].replace(',', '.')) })
+        // console.log(colegioStudent, 'colegioStudent')
 
 
 
-        const collectionRef = collection(FIRESTORE_DB, 'incidencia-estudiantil');
+
+        const collectionRef = collection(FIRESTORE_DB, 'incidencias');
         const fechaTimestamp = Timestamp.fromDate(new Date());
-        console.log('enviar', cordenadas, fechaTimestamp, incidenceTytpe, categoriaIncidencia, subject, description, auth.currentUser.uid)
-        const newUser = {
+        // console.log('enviar', cordenadas, fechaTimestamp, incidenceType, categoriaIncidencia, subject, description, auth.currentUser.uid)
+        const newIncidence = {
             idEstudiante: auth.currentUser.uid,
+            incidenceType: incidenceType,
             titulo: subject,
             fecha: fechaTimestamp,
-            ubicacion: new GeoPoint(parseFloat(colegioStudent['LATITUD'].replace(',', '.')), parseFloat(colegioStudent['LONGITUD'].replace(',', '.'))),
+            ubicacion: dataUserDb.rol === 'usuario' && incidenceType === 'Academica'
+                ? new GeoPoint(parseFloat(colegioChoose.LATITUD?.replace(',', '.')), parseFloat(colegioChoose.LONGITUD.replace(',', '.')))
+                : dataUserDb.rol === 'usuario' && incidenceType !== 'Academica'
+                    ? new GeoPoint(location.coords.latitude, location.coords.longitude)
+                    : dataUserDb.rol === 'estudiante' && incidenceType === 'Academica'
+                        ? new GeoPoint(parseFloat(colegioStudent.LATITUD?.replace(',', '.')), parseFloat(colegioStudent.LONGITUD.replace(',', '.')))
+                        : new GeoPoint(location.coords.latitude, location.coords.latitude),
+
             evidencia: urlImage,
             descripcion: description,
-            curso: dataUserDb.curso,
-            categoriaIncidencia: categoriaIncidencia
+            categoriaIncidencia: categoriaIncidencia,
+            curso: dataUserDb.rol === 'estudiante' ? dataUserDb.curso : 'N/A',
+
 
 
 
 
         };
 
-        await addDoc(collectionRef, newUser);
+
+        await addDoc(collectionRef, newIncidence);
 
         ToastAndroid.show('Incidencia enviada correctamente', ToastAndroid.LONG);
-        console.log(cordenadas, 'cordenadas')
+        // console.log(cordenadas, 'cordenadas')
     }
 
     return (
@@ -190,8 +207,7 @@ const FormIncidence = () => {
             onSubmit={(values, { resetForm }) => {
 
                 sentIncidence(values)
-                resetForm();
-                console.log(values, 'values')
+                resetForm()
 
 
             }}>
@@ -208,7 +224,7 @@ const FormIncidence = () => {
                             placeholderStyle={styles.placeholderStyle}
                             selectedTextStyle={styles.selectedTextStyle}
                             inputSearchStyle={styles.inputSearchStyle}
-                            name='incidenceTytpe'
+                            name='incidenceType'
                             data={incidencesType}
                             maxHeight={300}
                             placeholder="..."
@@ -216,18 +232,40 @@ const FormIncidence = () => {
                             valueField="value"
                             labelField="label"
                             onChange={(item) => {
-                                props.setFieldValue('incidenceTytpe', item.label);
-
+                                props.setFieldValue('incidenceType', item.label);
+                                setType(item.label);
                             }}
 
                         />
 
-                        {props.errors.incidenceTytpe && props.touched.incidenceTytpe && (
-                            <Text style={styles.error}>{props.errors.incidenceTytpe}</Text>
+
+                        {props.errors.incidenceType && props.touched.incidenceType && (
+                            <Text style={styles.error}>{props.errors.incidenceType}</Text>
                         )}
+                        {dataUserDb.rol === 'usuario' && type === 'Academica' && <Dropdown
+
+                            style={styles.dropdown}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            name='colegio'
+                            data={colegiosParseado}
+                            maxHeight={300}
+                            search
+                            placeholder="Selecciona Colegio"
+                            searchPlaceholder="Buscar..."
+                            valueField="NOMBRE ESTABLECIMIENTO"
+                            labelField="NOMBRE ESTABLECIMIENTO"
+                            onChange={(item) => {
+                                props.setFieldValue('colegio', item['NOMBRE ESTABLECIMIENTO'])
+                                setColegioChoose(item)
+
+                            }}
+
+                        />}
 
                         <Text style={styles.HeaderInput}>Asunto</Text>
-                        <FormikInputValueIncidence name='subject' placeholder='Ejemplo: pelea en la biblioteca' onChangeText={props.handleChange('subject')} value={props.values.subject} />
+                        <FormikInputValueIncidence name='subject' placeholder={dataUserDb.rol === 'estudiante' ? 'Ejemplo: pelea en la biblioteca' : 'Pelea  '} onChangeText={props.handleChange('subject')} value={props.values.subject} />
                         <Text style={styles.HeaderInput}>Descripcion</Text>
                         <FormikInputValueIncidence
                             name='description'
@@ -244,7 +282,7 @@ const FormIncidence = () => {
                             selectedTextStyle={styles.selectedTextStyle}
                             inputSearchStyle={styles.inputSearchStyle}
                             name='categoriaIncidencia'
-                            data={categoriaIncidencia}
+                            data={categoriasIncidencia}
                             maxHeight={300}
                             placeholder="..."
                             searchPlaceholder="Buscar..."
@@ -253,6 +291,7 @@ const FormIncidence = () => {
                             onChange={(item) => {
                                 props.setFieldValue('categoriaIncidencia', item.label);
                                 console.log(item.label, 'item')
+
                             }}
 
                         />

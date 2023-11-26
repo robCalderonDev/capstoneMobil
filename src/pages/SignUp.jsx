@@ -1,6 +1,6 @@
 import { Formik, useField } from 'formik'
 import React, { useContext, useEffect } from 'react'
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View, } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View, } from 'react-native'
 import { loginValidationSchena, loginValidationSchenaStudent, loginValidationSchenaUser } from '../validationSchemas/validationsForm'
 import StyledTextInput from '../components/styled/StyledTextInput'
 import Checkbox from 'expo-checkbox';
@@ -97,7 +97,7 @@ const SignUp = () => {
                     apellido: apellido,
                     colegio: colegio,
                     curso: curso,
-                    mail: email.toLowerCase(),
+                    email: email.toLowerCase(),
                     rol: 'estudiante'
 
                 };
@@ -117,7 +117,7 @@ const SignUp = () => {
                     rut: rut,
                     comuna: comuna,
                     calle: calle,
-                    mail: email.toLowerCase(),
+                    email: email.toLowerCase(),
                     rol: 'usuario'
 
                 };
@@ -130,7 +130,11 @@ const SignUp = () => {
                 // Puedes mostrar la respuesta de createUserWithEmailAndPassword si es necesario
             }
         } catch (error) {
-            ToastAndroid.show(error.message, ToastAndroid.LONG);
+            if (error.code === 'auth/email-already-in-use') {
+                ToastAndroid.show('el correo ya esta siendo utilizado', ToastAndroid.LONG);
+            }
+            console.log(error.code)
+
         } finally {
             // Realiza acciones finales si es necesario
             setLoading(false);
@@ -145,7 +149,7 @@ const SignUp = () => {
             initialValues={initialValues}
             onSubmit={(values) => {
                 handleSubmitSignUp(values)
-
+                console.log(values)
 
             }}>
             {(props) => {
@@ -155,6 +159,23 @@ const SignUp = () => {
                             <ModalForm setIsStudent={setIsStudent} setModalVisible={setModalVisible} modalVisible={modalVisible} />
                         ) : (isStudent ? (
                             <>
+                                <View style={{ justifyContent: 'center', alignItems: 'center', }}>
+                                    <Image
+                                        source={require('./../img/logo.png')}
+                                        style={{
+                                            width: 80,
+                                            height: 80,
+                                            marginTop: 0,
+                                            marginBottom: 15,
+                                            tintColor: '#fff',
+
+                                        }}
+                                    />
+                                </View>
+                                <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 30, marginTop: 10 }}>
+                                    Registrate en safety community
+                                </Text>
+
 
                                 <FormikInputValue name='nombre' placeholder='Nombre' onChangeText={props.handleChange('nombre')} value={props.values.nombre} />
                                 <FormikInputValue name='apellido' placeholder='Apellido' onChangeText={props.handleChange('apellido')} value={props.values.apellido} />
@@ -195,6 +216,22 @@ const SignUp = () => {
                         ) : (
                             <>
 
+                                <View style={{ justifyContent: 'center', alignItems: 'center', }}>
+                                    <Image
+                                        source={require('./../img/logo.png')}
+                                        style={{
+                                            width: 80,
+                                            height: 80,
+                                            marginTop: 0,
+                                            marginBottom: 15,
+                                            tintColor: '#fff',
+
+                                        }}
+                                    />
+                                </View>
+                                <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 30, marginTop: 10 }}>
+                                    Registrate en safety community
+                                </Text>
                                 <FormikInputValue name='nombre' placeholder='Nombre' onChangeText={props.handleChange('nombre')} value={props.values.nombre} />
                                 <FormikInputValue name='nombre' placeholder='Apellido' onChangeText={props.handleChange('apellido')} value={props.values.apellido} />
                                 <Dropdown
@@ -277,11 +314,12 @@ const styles = StyleSheet.create({
     },
 
     touchableSignUp: {
-        width: '80%',
+        width: '100%',
         height: 50,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#2F5A73',
+        borderRadius: 3
     },
     touchabletext: {
         fontWeight: 'bold',

@@ -47,7 +47,7 @@ const StackMain = () => {
             </View>
         );
     }
-
+    console.log(dataUserDb)
     return (
         <NavigationContainer independent={true}>
 
@@ -65,7 +65,7 @@ const StackMain = () => {
 
             }} drawerContent={(props) => <CustomDrawerContent {...props} />} >
 
-                {dataUserDb.rol === "estudiante" ? <>
+                {dataUserDb.rol === "estudiante" || dataUserDb.rol === "usuario" ? <>
                     <Drawer.Screen name="Home" component={Home} options={{
                         drawerIcon: ({ color }) => (<Ionicons name="home" size={24} color={color} />),
                         headerStyle: {
@@ -85,9 +85,34 @@ const StackMain = () => {
                         headerShadowVisible: false,
                     }} />
 
-                </> :
+                </> : dataUserDb.rol === 'directorescuela' ?
                     <>
 
+                        <Drawer.Screen name="Home" component={Home} options={{
+                            drawerIcon: ({ color }) => (<Ionicons name="home" size={24} color={color} />),
+                            headerStyle: {
+                                backgroundColor: '#1E1F22',
+                                // Cambia el color de fondo de la pantalla
+                            }, headerTintColor: 'white',
+                            headerShadowVisible: false,
+                            headerTitleAlign: 'center', // Centra el título en el header
+                        }} />
+
+                        <Drawer.Screen name="Dashboard" component={DashBoard} options={{
+                            drawerIcon: ({ color }) => (<AntDesign name="dashboard" size={24} color="white" />),
+                            headerStyle: {
+                                backgroundColor: '#1E1F22',
+                                // Cambia el color de fondo de la pantalla
+                            }, headerTintColor: 'white',
+                            headerShadowVisible: false,
+                            headerTitleAlign: 'center', // Centra el título en el header
+
+                        }} />
+
+                    </>
+                    :
+                    <>
+                        {/* aca estan el director comunidad y directorgeneral */}
                         <Drawer.Screen name="Home" component={Home} options={{
                             drawerIcon: ({ color }) => (<Ionicons name="home" size={24} color={color} />),
                             headerStyle: {

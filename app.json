@@ -34,7 +34,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#fafafa"
       },
       "config": {
         "googleMaps": {
@@ -42,7 +42,8 @@
         }
       },
       "permissions": [
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "ACCESS_FINE_LOCATION"
       ],
       "package": "com.robcalderonv.capstoneMobile"
     },

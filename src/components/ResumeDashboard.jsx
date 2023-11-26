@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import { FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RecordContext } from '../context/context';
 import { FIRESTORE_DB } from '../FirebaseConfig'
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
+import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore'
 import { useState } from 'react';
 import ModalIncidence from '../components/modals/ModalIncidence';
 import { FlashList } from "@shopify/flash-list";
@@ -25,10 +25,14 @@ const ResumeDashboard = () => {
 
     const fechaFormateada = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
 
+    const q = dataUserDb.rol === 'directorescuela' ? query(collection(FIRESTORE_DB, 'incidencias'),
+        where('ubicacion', '==', dataUserDb.ubicacion), orderBy('fecha', 'desc')
+    ) : dataUserDb.rol === 'directorcomunidad' ? query(collection(FIRESTORE_DB, 'incidencias'), where('incidenceType', '==', 'Comunitaria'), orderBy('fecha', 'desc')) :
+        query(collection(FIRESTORE_DB, 'incidencias'), where('incidenceType', '==', 'Academica'), orderBy('fecha', 'desc'))
 
     useEffect(() => {
         const unsubscribe = onSnapshot(
-            query(collection(FIRESTORE_DB, 'incidencia-estudiantil'), orderBy('fecha', 'desc')),
+            q,
             (querySnapshot) => {
                 const documents = querySnapshot.docs.map((doc) => ({
                     ...doc.data(),
@@ -125,7 +129,16 @@ const ResumeDashboard = () => {
                     alignItems: 'center',
                 }}>
 
-                    <TouchableOpacity style={styles.cardOptions} onPress={() => navigation.navigate('Dashboard')}>
+                    <TouchableOpacity style={{
+                        width: dataUserDb.rol !== 'directorescuela' ? '40%' : '90%',
+                        height: dataUserDb.rol !== 'directorescuela' ? 80 : 100,
+                        backgroundColor: '#272b34',
+                        borderRadius: 10,
+                        marginHorizontal: 25,
+                        flexDirection: 'row', // Configura la dirección del contenedor como "row"
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }} onPress={() => navigation.navigate('Dashboard')}>
                         <Image
                             source={require('../img/dashboard.png')}
                             style={{
@@ -144,7 +157,7 @@ const ResumeDashboard = () => {
                         </View>
 
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.cardOptions} onPress={() => navigation.navigate('Maps')}>
+                    {dataUserDb.rol !== 'directorescuela' && <TouchableOpacity style={styles.cardOptions} onPress={() => navigation.navigate('Maps')}>
                         <Image
                             source={require('../img/maps.png')}
                             style={{
@@ -158,6 +171,7 @@ const ResumeDashboard = () => {
                         <Text style={styles.textCardOptions}>ver Mapa</Text>
 
                     </TouchableOpacity>
+                    }
 
                 </View>
             </View>

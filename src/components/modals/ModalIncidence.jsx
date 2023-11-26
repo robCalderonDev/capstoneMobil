@@ -33,7 +33,8 @@ const ModalIncidence = ({ modalVisible, setModalVisible, itemSelected }) => {
 
                         </View>
                         <Text style={styles.modalText}>{itemSelected.descripcion}  </Text>
-                        <Text style={styles.modalText}>curso: {itemSelected.curso}</Text>
+                        {itemSelected.curso && <Text style={styles.modalText}>curso: {itemSelected.curso}</Text>}
+
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity style={styles.touchableOpacity1} onPress={() => {
 
