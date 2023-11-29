@@ -8,6 +8,7 @@ import ModalIncidence from '../components/modals/ModalIncidence';
 import { FlashList } from "@shopify/flash-list";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import CardIncidence from './CardIncidence';
 const ResumeDashboard = () => {
 
     const navigation = useNavigation()
@@ -219,12 +220,13 @@ const styles = StyleSheet.create({
     },
     cardIncidence: {
         margin: 5,
-        padding: 10,
+        padding: 20,
         backgroundColor: '#272b34',
         borderRadius: 10,
         marginHorizontal: 20,
         height: '90%',
         flexDirection: 'row',
+
     },
     cardTotal: {
         margin: 10,

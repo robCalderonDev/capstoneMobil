@@ -13,11 +13,11 @@ const RecordProvider = ({ children }) => {
     const [dataUserDb, setDataUserDb] = useState({})
     const [user, setUser] = useState(null)
     const [colegiosParseado, setColegiosParseado] = useState({})
-
+    const [userId, setUserId] = useState()
     const [docs, setdocs] = useState([])
     const auth = FIREBASE_AUTH;
-
-    ; // Reemplaza 'tuDocumentoID' con el ID del documento que deseas buscar
+    const [reload, setReload] = useState(false)
+        ; // Reemplaza 'tuDocumentoID' con el ID del documento que deseas buscar
 
 
     const getDataUser = async () => {
@@ -31,6 +31,8 @@ const RecordProvider = ({ children }) => {
             if (docSnapshotUsuarios.exists()) {
                 const dataUsuarios = docSnapshotUsuarios.data();
                 setDataUserDb(dataUsuarios);
+                setUserId(docSnapshotUsuarios.id)
+
             } else {
                 console.log('El documento no existe en usuarios');
             }
@@ -45,6 +47,8 @@ const RecordProvider = ({ children }) => {
 
             if (docSnapshotEstudiantes.exists()) {
                 const dataEstudiantes = docSnapshotEstudiantes.data();
+                console.log(docSnapshotEstudiantes.id, 'sd')
+                setUserId(docSnapshotEstudiantes.id)
                 setDataUserDb(dataEstudiantes);
             } else {
                 console.log('El documento no existe en estudiantes');
@@ -76,7 +80,10 @@ const RecordProvider = ({ children }) => {
                 getDataUser,
                 docs,
                 setdocs,
-
+                setUserId,
+                userId,
+                setReload,
+                reload
 
 
             }}

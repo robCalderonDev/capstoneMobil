@@ -17,7 +17,7 @@ const ModalIncidence = ({ modalVisible, setModalVisible, itemSelected }) => {
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <View style={styles.titleContainer}>
-                            <Text style={styles.modalTitle}>{itemSelected.titulo}</Text>
+                            <Text style={styles.modalTitle}>{itemSelected?.titulo}</Text>
                             {/* <Image
                                 source={require('../../img/check.png')}
                                 style={{
@@ -32,8 +32,8 @@ const ModalIncidence = ({ modalVisible, setModalVisible, itemSelected }) => {
                         <View>
 
                         </View>
-                        <Text style={styles.modalText}>{itemSelected.descripcion}  </Text>
-                        {itemSelected.curso && <Text style={styles.modalText}>curso: {itemSelected.curso}</Text>}
+                        <Text style={styles.modalText}>{itemSelected?.descripcion}  </Text>
+                        {itemSelected?.curso && <Text style={styles.modalText}>curso: {itemSelected?.curso}</Text>}
 
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity style={styles.touchableOpacity1} onPress={() => {

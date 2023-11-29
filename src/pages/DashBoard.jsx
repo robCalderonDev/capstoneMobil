@@ -16,8 +16,10 @@ const DashBoard = () => {
     const [docs, setdocs] = useState([]);
     const [countByCourse, setCountByCourse] = useState({})
     const [chartData, setChartData] = useState(null);
+    const [chartDataDate, setChartDataDate] = useState()
     const [chartDataPie, setChartDataPie] = useState(null)
-
+    const [countByMonth, setCountByMonth] = useState()
+    const [countByComuna, setCountByComuna] = useState()
     useEffect(() => {
         // Almacenar la función de limpieza para desregistrar el observador
         const unsubscribe = onSnapshot(
@@ -37,7 +39,7 @@ const DashBoard = () => {
 
 
     }, []);
-    const reference = collection(FIRESTORE_DB, 'incidencias');
+
     const q = dataUserDb.rol === 'directorescuela' ? query(collection(FIRESTORE_DB, 'incidencias'),
         where('ubicacion', '==', dataUserDb.ubicacion),
     ) : dataUserDb.rol === 'directorcomunidad' ? query(collection(FIRESTORE_DB, 'incidencias'), where('incidenceType', '==', 'Comunitaria')) :
@@ -73,7 +75,7 @@ const DashBoard = () => {
                     });
                     return countByCourseData;
                     // Hacer algo con countByCourseData, por ejemplo, imprimirlo
-                    console.log(countByCourseData);
+
                 },
                 (error) => {
                     console.error('Error getting documents: ', error);
@@ -86,6 +88,88 @@ const DashBoard = () => {
             throw error;
         }
     };
+    const getDocumentCountByMonth = async () => {
+        try {
+            const querySnapshot = await getDocs(q);
+            const countByMonth = {};
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+
+                const incidenceDate = data.fecha.toDate(); // Assuming incidenceDate is a Date object
+
+                // Get month information
+                const monthName = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(incidenceDate);
+
+                // Increment the counter for the corresponding month
+                countByMonth[monthName] = (countByMonth[monthName] || 0) + 1;
+            });
+
+            // Create a sorted array of month names
+            const sortedMonths = Object.keys(countByMonth).sort((a, b) => {
+                const monthOrder = {
+                    'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4, 'mayo': 5, 'junio': 6,
+                    'julio': 7, 'agosto': 8, 'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12,
+                };
+
+                return monthOrder[a.toLowerCase()] - monthOrder[b.toLowerCase()];
+            });
+
+            // Update the state with the count by month
+            setCountByMonth(countByMonth);
+            const labels = sortedMonths;
+            const data = labels.map((label) => countByMonth[label]);
+
+            // Actualizar el estado con el recuento por mes y los nuevos labels
+            setChartDataDate({
+                labels: labels,
+                datasets: [
+                    {
+                        data: data,
+                    },
+                ],
+            });
+
+            // Do something with countByMonth, e.g., log it
+            console.log('Count by Month:', countByMonth);
+
+            // You can return countByMonth if needed for further processing
+            return countByMonth;
+        } catch (error) {
+            console.error('Error getting data:', error);
+            throw error;
+        }
+    };
+
+
+    const getDocumentCountByComuna = async () => {
+        try {
+            const querySnapshot = await getDocs(q);
+            const countByComuna = {};
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+
+                const comuna = data.comuna; // Assuming "comuna" is the field in your data
+
+                // Increment the counter for the corresponding comuna
+                countByComuna[comuna] = (countByComuna[comuna] || 0) + 1;
+            });
+
+            // Update the state with the count by comuna
+            setCountByComuna(countByComuna);
+
+            // Do something with countByComuna, e.g., log it
+            console.log('Count by Comuna:', countByComuna);
+
+            // You can return countByComuna if needed for further processing
+            return countByComuna;
+        } catch (error) {
+            console.error('Error getting data:', error);
+            throw error;
+        }
+    };
+
     const getDocumetnsByCategory = async () => {
         onSnapshot(
             q,
@@ -115,27 +199,37 @@ const DashBoard = () => {
 
                 setChartDataPie(countArray);
 
-                // Aquí, countArray contendrá el array con el formato requerido
-                console.log(countArray, 'countArray');
 
                 // Si necesitas devolver el array countArray, puedes hacerlo
                 return countArray;
             }
         );
     }
-    console.log(chartDataPie, 'data')
-
 
 
 
     useEffect(() => {
         getDocumentCountByCourse();
         getDocumetnsByCategory()
+        getDocumentCountByMonth()
+        getDocumentCountByComuna()
     }, []);
     // Imprimir el recuento por curso
+    const renderItem = ({ item }) => {
+        console.log(item, 'item');
 
-    console.log('Array con formato requerido:', countByCourse);
-
+        return (
+            <TouchableOpacity
+                style={styles.cardIncidence}
+                key={item.comuna}  // Usa el identificador único (comuna) como clave
+            >
+                <View style={{ width: '80%' }}>
+                    <Text style={styles.titleCardIncidence}>{item.comuna}</Text>
+                    <Text style={styles.descripcionCardIncidence}>{item.count}</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -146,25 +240,118 @@ const DashBoard = () => {
 
             </View> */}
             <View style={styles.charts}>
+                {dataUserDb.rol === 'directorcomunidad' ? <>
 
-                <Text style={styles.titleChart}>Cantidad de Incidencias por nivel</Text>
 
-                {chartData ? <LineGraph chartData={chartData} /> :
-                    <View style={styles.cardTotal}>
-                        <ActivityIndicator size='large' color='#0000dff' />
-                    </View>
-                }
+                    <Text style={styles.titleChart}>Cantidad de incidencias por mes</Text>
+                    {chartDataDate ?
+                        <BarGraph chartData={chartDataDate} />
+                        : <View style={styles.cardTotal}>
+                            <ActivityIndicator size='large' color='#0000dff' />
+                        </View>}
 
-                <Text style={styles.titleChart}>Porcentaje de Incidencia por nivel</Text>
-                {chartData ?
-                    <BarGraph chartData={chartData} />
-                    : <View style={styles.cardTotal}>
+                    <Text style={styles.titleChart}>Cantidad de tipo de incidencias</Text>
+                    {chartDataPie ? <PieGraph chartDataPie={chartDataPie} /> : <View style={styles.cardTotal}>
                         <ActivityIndicator size='large' color='#0000dff' />
                     </View>}
-                <Text style={styles.titleChart}>Cantidad de tipo de incidencias</Text>
-                {chartDataPie ? <PieGraph chartDataPie={chartDataPie} /> : <View style={styles.cardTotal}>
-                    <ActivityIndicator size='large' color='#0000dff' />
-                </View>}
+                    <Text style={styles.titleChart}> cantidad de incidencias por comuna comunidad</Text>
+
+
+                    <View style={styles.flatList}>
+
+
+                        {countByComuna ? (
+                            Object.keys(countByComuna).map((comuna) => (
+                                <TouchableOpacity
+                                    style={styles.cardIncidence}
+                                    key={comuna}  // Usa el nombre de la comuna como clave
+                                >
+                                    <View style={{ width: '80%' }}>
+                                        <Text style={styles.titleCardIncidence}>{comuna}</Text>
+                                        <Text style={styles.descripcionCardIncidence}>{countByComuna[comuna]}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            ))
+                        ) : (
+                            <ActivityIndicator size='large' color='#0000dff' />
+                        )}
+
+
+                    </View>
+
+
+
+
+                </> : dataUserDb.rol === 'directorgeneral' ?
+                    <>
+                        <Text style={styles.titleChart}> cantidad de incidencias por comuna director general</Text>
+                        <Text style={styles.titleChart}> Cantidad de Incidencias por nivel</Text>
+
+                        {chartData ? <LineGraph chartData={chartData} /> :
+                            <View style={styles.cardTotal}>
+                                <ActivityIndicator size='large' color='#0000dff' />
+                            </View>
+                        }
+                        <Text style={styles.titleChart}>Cantidad de incidencias por mes</Text>
+                        {chartDataDate ?
+                            <BarGraph chartData={chartDataDate} />
+                            : <View style={styles.cardTotal}>
+                                <ActivityIndicator size='large' color='#0000dff' />
+                            </View>}
+
+                        <Text style={styles.titleChart}>Cantidad de tipo de incidencias</Text>
+                        {chartDataPie ? <PieGraph chartDataPie={chartDataPie} /> : <View style={styles.cardTotal}>
+                            <ActivityIndicator size='large' color='#0000dff' />
+                        </View>}
+
+                        <View style={styles.flatList}>
+
+                            <Text style={styles.titleChart}> cantidad de incidencias por comuna comunidad</Text>
+                            {countByComuna ? (
+                                Object.keys(countByComuna).map((comuna) => (
+                                    <TouchableOpacity
+                                        style={styles.cardIncidence}
+                                        key={comuna}  // Usa el nombre de la comuna como clave
+                                    >
+                                        <View style={{ width: '80%' }}>
+                                            <Text style={styles.titleCardIncidence}>{comuna}</Text>
+                                            <Text style={styles.descripcionCardIncidence}>{countByComuna[comuna]}</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                ))
+                            ) : (
+                                <ActivityIndicator size='large' color='#0000dff' />
+                            )}
+
+
+                        </View>
+
+
+                    </> : <>
+                        <Text style={styles.titleChart}> Cantidad de Incidencias por nivel</Text>
+
+                        {chartData ? <LineGraph chartData={chartData} /> :
+                            <View style={styles.cardTotal}>
+                                <ActivityIndicator size='large' color='#0000dff' />
+                            </View>
+                        }
+                        <Text style={styles.titleChart}>Cantidad de incidencias por mes</Text>
+                        {chartDataDate ?
+                            <BarGraph chartData={chartDataDate} />
+                            : <View style={styles.cardTotal}>
+                                <ActivityIndicator size='large' color='#0000dff' />
+                            </View>}
+
+                        <Text style={styles.titleChart}>Cantidad de tipo de incidencias</Text>
+                        {chartDataPie ? <PieGraph chartDataPie={chartDataPie} /> : <View style={styles.cardTotal}>
+                            <ActivityIndicator size='large' color='#0000dff' />
+                        </View>}
+
+
+                    </>}
+
+
+
 
 
             </View>
@@ -182,11 +369,15 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
+        marginTop: 15
     },
 
     flatList: {
+        marginTop: 30,
+        height: '70%',
+        width: '90%',
+        flex: 1,
 
-        height: '45%',
 
     },
     cardIncidence: {
@@ -195,7 +386,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#272b34',
         borderRadius: 10,
         marginHorizontal: 20,
-        height: '90%',
+        height: '100',
         flexDirection: 'row',
     },
     cardTotal: {
@@ -255,7 +446,11 @@ const styles = StyleSheet.create({
     charts: {
         justifyContent: 'center',
         alignItems: 'center',
-    }
+    },
+    subcontainer2: {
+
+        height: '50%'
+    },
 })
 
 

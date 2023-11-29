@@ -3,6 +3,27 @@ import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import { BarChart } from 'react-native-chart-kit'
 
 const BarGraph = ({ chartData }) => {
+    const order = [
+        '1° Básico',
+        '2° Básico',
+        '3° Básico',
+        '4° Básico',
+        '5° Básico',
+        '6° Básico',
+        '7° Básico',
+        '8° Básico',
+        '1° Medio',
+        '2° Medio',
+        '3° Medio',
+        '4° Medio',
+    ];
+
+    // Ordena los datos según el orden específico
+    const sortedData = {
+        labels: order,
+        datasets: chartData.datasets,
+    };
+
     return (
         <View>
 
@@ -14,27 +35,25 @@ const BarGraph = ({ chartData }) => {
                 }}
                 data={chartData}
                 width={(Dimensions.get("window").width) * 0.95} // from react-native
-                height={220}
+                height={350}
                 // yAxisLabel="$"
 
                 chartConfig={{
                     backgroundColor: "#272b34",
                     backgroundGradientFrom: "#272b34",
                     backgroundGradientTo: "#272b34",
-                    propsForLabels: { fontSize: 12, },
+                    propsForLabels: { fontSize: 12, dx: -17, },
+
                     decimalPlaces: 0, // optional, defaults to 2dp
                     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     style: {
-                        borderRadius: 16
+                        borderRadius: 16,
+
                     },
-                    propsForDots: {
-                        r: "6",
-                        strokeWidth: "2",
-                        stroke: "#ffa726"
-                    }
+                    barPercentage: 0.2,
                 }}
-                verticalLabelRotation={0}
+                verticalLabelRotation={90}
             />
         </View>
     )
@@ -49,6 +68,7 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
+
     },
 })
 export default BarGraph

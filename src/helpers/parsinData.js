@@ -7,6 +7,8 @@ export const obtenerDataColegios = (colegios) => {//funcion para extraer el nomb
             "NOMBRE ESTABLECIMIENTO": colegios[i]["NOMBRE ESTABLECIMIENTO"],
             "LATITUD": colegios[i]["LATITUD"],
             "LONGITUD": colegios[i]["LONGITUD"],
+            "COMUNA": colegios[i]["COMUNA"],
+
         };
         resultados.push(establecimiento);
     }

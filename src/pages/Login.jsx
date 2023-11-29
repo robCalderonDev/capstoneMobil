@@ -12,7 +12,7 @@ import { Query, collection, doc, getDoc, getDocs, query, where } from "firebase/
 
 const Login = () => {
 
-    const { loanding, setLoading, setDataUserDb } = useContext(RecordContext);
+    const { loanding, setLoading, setDataUserDb, setReload } = useContext(RecordContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigation = useNavigation(); // Obtiene el objeto navigation
@@ -41,6 +41,7 @@ const Login = () => {
 
 
             setLoading(false);
+
         }
 
     }

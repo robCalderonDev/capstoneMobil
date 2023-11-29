@@ -59,7 +59,7 @@ const FormIncidence = () => {
     const [urlImage, setUrlImage] = useState('')
     const [loading, setLoading] = useState(false)
     const [type, setType] = useState()
-    const { colegiosParseado, setColegiosParseado, dataUserDb } = useContext(RecordContext);
+    const { colegiosParseado, setColegiosParseado, dataUserDb, setReload } = useContext(RecordContext);
 
     const [colegioChoose, setColegioChoose] = useState({})
     const auth = FIREBASE_AUTH;
@@ -161,7 +161,7 @@ const FormIncidence = () => {
         const colegioStudent = colegiosParseado.find(colegio => colegio['NOMBRE ESTABLECIMIENTO'] === dataUserDb.colegio)
         // console.log(colegioStudent, 'colegioStudent')
 
-
+        console.log(colegioStudent, 'colegiostudent')
 
 
         const collectionRef = collection(FIRESTORE_DB, 'incidencias');
@@ -183,8 +183,8 @@ const FormIncidence = () => {
             evidencia: urlImage,
             descripcion: description,
             categoriaIncidencia: categoriaIncidencia,
-            curso: dataUserDb.rol === 'estudiante' ? dataUserDb.curso : 'N/A',
-
+            curso: dataUserDb.rol === 'estudiante' ? dataUserDb.curso : 'N/E',
+            comuna: dataUserDb.rol === 'usuario' ? dataUserDb.comuna : (colegioStudent["COMUNA"]).toLowerCase()
 
 
 
@@ -196,6 +196,7 @@ const FormIncidence = () => {
 
         ToastAndroid.show('Incidencia enviada correctamente', ToastAndroid.LONG);
         // console.log(cordenadas, 'cordenadas')
+        setReload(true)
     }
 
     return (

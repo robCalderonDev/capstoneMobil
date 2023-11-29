@@ -34,7 +34,7 @@ const FormikInputValue = ({ name, ...props }) => {
 }
 
 const SignUp = () => {
-    const { regiones, choosedItem, loading, setLoading, setDataUserDb, colegiosParseado, setColegiosParseado } = useContext(RecordContext);
+    const { regiones, choosedItem, loading, setLoading, setDataUserDb, colegiosParseado, setColegiosParseado, setReload } = useContext(RecordContext);
     const [comunas, setComunas] = useState([]);
     const [cursosParse, setCursosParse] = useState([{}])
 
@@ -138,6 +138,7 @@ const SignUp = () => {
         } finally {
             // Realiza acciones finales si es necesario
             setLoading(false);
+            setReload(true)
         }
     }
 

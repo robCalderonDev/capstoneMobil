@@ -1,29 +1,30 @@
 import React from 'react'
-import { Dimensions, StyleSheet, View } from 'react-native'
+import { Dimensions, ScrollView, StyleSheet, View } from 'react-native'
 import { LineChart } from 'react-native-chart-kit'
 
 const LineGraph = ({ chartData }) => {
+    console.log('chartdat', chartData)
     return (
-        <View >
+        <ScrollView>
             <LineChart
-
                 data={chartData}
-                width={(Dimensions.get("window").width) * 0.95} // from react-native
-                height={220}
-
-
-
-                yAxisInterval={1} // optional, defaults to 1
+                width={(Dimensions.get("window").width) * 0.95}
+                height={300}
+                verticalLabelRotation={90}
+                yAxisInterval={1}
                 chartConfig={{
                     backgroundColor: "#272b34",
                     backgroundGradientFrom: "#272b34",
                     backgroundGradientTo: "#272b34",
-                    propsForLabels: { fontSize: 12, },
-                    decimalPlaces: 0, // optional, defaults to 2dp
+
+
+                    propsForLabels: { fontSize: 12, dx: -15, },// Establece margin en 0 o null
+                    decimalPlaces: 0,
                     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     style: {
-                        borderRadius: 16
+                        borderRadius: 16,
+
                     },
                     propsForDots: {
                         r: "6",
@@ -31,15 +32,21 @@ const LineGraph = ({ chartData }) => {
                         stroke: "#56AF84"
                     }
                 }}
-                bezier//para que sea efecto smooth
+                bezier
                 style={{
-                    marginVertical: 8,
-                    borderRadius: 16
+
+                    marginVertical: 10,
+                    borderRadius: 16,
+
+
+
                 }}
             />
-        </View>
+        </ScrollView>
     )
 }
+
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,

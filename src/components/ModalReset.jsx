@@ -31,8 +31,8 @@ const ModalReset = ({ modalVisible, setModalVisible, email, setEmail }) => {
                         </View>
 
                         <Text style={styles.modalText}>Hemos enviado instrucciones para cambiar la contraseña a <Text style={styles.mail}>{email}</Text>. Revisa tu bandeja de entrada</Text>
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={styles.touchableOpacity1} onPress={() => {
+                        <View style={styles.buttonContainer} testID='modal-container' >
+                            <TouchableOpacity style={styles.touchableOpacity1} testID='myButton:button:ClickMe' onPress={() => {
 
                                 setModalVisible(!modalVisible);
                                 setEmail('');

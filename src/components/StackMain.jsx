@@ -23,7 +23,7 @@ const StackMain = () => {
     const { dataUserDb, setDataUserDb } = useContext(RecordContext);
     const signOut = () => {
         FIREBASE_AUTH.signOut()
-        setDataUserDb({})
+        setDataUserDb('')
         ToastAndroid.show('Ha cerrado su sesion', ToastAndroid.LONG);
     }
     function CustomDrawerContent(props) {
